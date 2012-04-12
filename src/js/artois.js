@@ -154,12 +154,11 @@
        	var slider = _scope.container.querySelector(_scope.options.slider),
     		containerDimensions = _getElementDimensions(_scope.container),
     		elDimensions = _getElementDimensions(_scope.elements[0]),
-    		pages = Math.ceil(_scope.filteredElements.length/(_scope.options.rows*_scope.options.cols))
+    		pages = Math.ceil(_scope.filteredElements.length/(_scope.options.rows*_scope.options.cols)),
     		sliderWidth = pages * containerDimensions.width
 
     	if(parseFloat(slider.offsetLeft) > -(sliderWidth - containerDimensions.width))
     		_animate(slider,{"left":(parseFloat(slider.offsetLeft) - containerDimensions.width) + 'px'})
-    	}
     	
     }
 
