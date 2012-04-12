@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>artois.js test</title>
+		<style type="text/css">
+			#artois-container{
+				width:800px;
+				height:450px;
+				overflow:hidden;
+				background:#ccc;
+				position:relative;
+			}
+
+			.artois-slider{
+				position:relative;
+			}
+
+			.artois-item{
+				width:190px;
+				margin:5px;
+				height:125px;
+				position:absolute;
+				color:white;
+				font-size:100px;
+				text-align:center;
+				font-family:'Helvetica';
+				padding-top:15px;
+			}
+
+			.green{
+				background:green;
+			}
+
+			.blue{
+				background:blue;
+			}
+
+			.red{
+				background:red;
+			}
+
+			a{
+				cursor:pointer;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="artois-container">
+			<div class="artois-slider">
+				<div class='artois-item red' id="item-1">1</div>
+				<div class='artois-item red' id="item-2">2</div>
+				<div class='artois-item blue' id="item-3">3</div>
+				<div class='artois-item green' id="item-4">4</div>
+				<div class='artois-item blue' id="item-5">5</div>
+				<div class='artois-item blue' id="item-6">6</div>
+				<div class='artois-item red' id="item-7">7</div>
+				<div class='artois-item green' id="item-8">8</div>
+				<div class='artois-item red' id="item-9">9</div>
+				<div class='artois-item green' id="item-10">10</div>
+				<div class='artois-item green' id="item-11">11</div>
+				<div class='artois-item blue' id="item-12">12</div>
+				<div class='artois-item red' id="item-13">13</div>
+				<div class='artois-item blue' id="item-14">14</div>
+				<div class='artois-item green' id="item-15">15</div>
+				<div class='artois-item red' id="item-16">16</div>
+				<div class='artois-item green' id="item-17">17</div>
+			</div>
+		</div>
+
+		<a onclick='gallery.reset()'>Reset</a> |
+		<a onclick='reorder()'>Re-order elements</a> |
+		<a onclick='filterEls("blue")'>Blue</a>
+		<a onclick='filterEls("red")'>Red</a>
+		<a onclick='filterEls("green")'>Green</a> |
+		<a onclick='gallery.prev()'>Prev</a>
+		<a onclick='gallery.next()'>Next</a>
+		<script type="text/javascript" src="../src/js/artois.js"></script>
+		<script type="text/javascript">
+			var gallery = artois('#artois-container')
+
+			function reorder(){
+				var order = [
+								'#item-4',
+								'#item-11',
+								'#item-9',
+								'#item-15',
+								'#item-3',
+								'#item-1',
+								'#item-13',
+								'#item-6',
+								'#item-5',
+								'#item-17',
+								'#item-7',
+								'#item-16',
+								'#item-2',
+								'#item-10',
+								'#item-14',
+								'#item-8',
+								'#item-12']
+
+				gallery.order(order)
+			}
+
+			function filterEls(colour){
+				re = new RegExp('(^|\\s)' + colour + '(\\s|$)')
+				gallery.filter(function(el){return re.test(el.className)})
+			}
+		</script>
+	</body>
+</html>
