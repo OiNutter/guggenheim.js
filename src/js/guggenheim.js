@@ -11,14 +11,12 @@
     	easing = {
 			ease: function(pos) { return (-Math.cos(pos*Math.PI)/2) + 0.5 },
 			linear: function(pos){ return pos }
-		}
-
-	_scope.prefix = ""
+		},
+		animating = false,
+		prefix = ""
 
     function _downcase(str) { return str.toLowerCase() }
-  	function _normalizeEvent(name) { return eventPrefix ? eventPrefix + name : downcase(name) }
-
-  	
+  	function _normalizeEvent(name) { return eventPrefix ? eventPrefix + name : _downcase(name) }
 
 	function _getObjKeys(obj){
 		if(typeof obj != 'object')
@@ -119,7 +117,10 @@
      		el.style.setProperty(_scope.prefix + 'transition-property',transitions.join(', '),'')
      		el.style.setProperty(_scope.prefix + 'transition-duration',_scope.options.duration + 's','')
      		el.style.setProperty(_scope.prefix + 'transition-timing-function',_scope.options.easing,'');
-   
+   			
+   			if(_scope.options.duration>0)
+   				_addEvent(el,_normalizeEvent('TransitionEnd'),callback)
+
      		for (key in props)
        			el.style[key] = props[key]
              
@@ -142,15 +143,30 @@
     }
 
     _scope.prev = function(){
+    	if(_scope.animating)
+    		return false
+
+    	_scope.animating = true
+
     	var slider = _scope.container.querySelector(_scope.options.slider),
-    		containerDimensions = _getElementDimensions(_scope.container)
+    		containerDimensions = _getElementDimensions(_scope.container),
+    		elDimensions = _getElementDimensions(_scope.elements[0]),
+    		pages = Math.ceil(_scope.filteredElements.length/(_scope.options.rows*_scope.options.cols)),
+    		sliderWidth = pages * containerDimensions.width
 
     	if(parseFloat(slider.offsetLeft) != 0)
-    		slider.style.left = (parseFloat(slider.style.left) + containerDimensions.width) + 'px'
+    		_animate(slider,{"left":(parseFloat(slider.offsetLeft) + containerDimensions.width) + 'px'},function(){_scope.animating=false})
+    	else
+    		_scope.animating = false
 
     }
 
     _scope.next = function(){
+    	if(_scope.animating)
+    		return false
+
+    	_scope.animating = true
+
        	var slider = _scope.container.querySelector(_scope.options.slider),
     		containerDimensions = _getElementDimensions(_scope.container),
     		elDimensions = _getElementDimensions(_scope.elements[0]),
@@ -158,7 +174,9 @@
     		sliderWidth = pages * containerDimensions.width
 
     	if(parseFloat(slider.offsetLeft) > -(sliderWidth - containerDimensions.width))
-    		_animate(slider,{"left":(parseFloat(slider.offsetLeft) - containerDimensions.width) + 'px'})
+    		_animate(slider,{"left":(parseFloat(slider.offsetLeft) - containerDimensions.width) + 'px'},function(){ _scope.animating=false})
+    	else
+    		_scope.animating = false
     	
     }
 
@@ -172,7 +190,13 @@
 			containerDimensions = _getElementDimensions(_scope.container),
 			page = 0,
 			i,
-			props = {}
+			props = {},
+			classString
+
+		if(typeof filterFunction == 'string' || Array.isArray(filterFunction) ){
+			classString = typeof filterFunction == 'string' ? filterFunction : '(?=.*\\b' + filterFunction.join('\\b)(?=.*\\b') + '\\b)'
+			filterFunction = function(el){ return (new RegExp('(^|\\s)' + classString + '(\\s|$)')).test(el.className)}
+		}
 
 		_scope.filteredElements = []
 
@@ -271,22 +295,51 @@
 		order(initialOrder)
 	}
 
+	_scope.setUpElements = function(){
+		var i,
+			width = 0,
+			height = 0,
+			containerDimensions = _getElementDimensions(_scope.container)
+		
+		for(i=0;i<_scope.elements.length;i++){
+			dimensions = _getElementDimensions(_scope.elements[i])
+			if(dimensions.width > width) width = dimensions.width
+			if(dimensions.height > height) height = dimensions.height
+		}
+
+		if (width>containerDimensions.width/_scope.options.cols) width = Math.floor(containerDimensions.width/_scope.options.cols)
+		if (height>containerDimensions.height/_scope.options.rows) height = Math.floor(containerDimensions.height/_scope.options.rows)
+
+		for(i=0;i<_scope.elements.length;i++){
+			_scope.elements[i].style.position = 'absolute'
+			_scope.elements[i].style.width = width + 'px'
+			_scope.elements[i].style.height = height + 'px'
+		}
+	}
+	
 	function initialize(element,options){
 		if(typeof element == 'string' && document.querySelector(element)==null)
 			throw new Exception('Element ' + element + " does not exist!");
 
 		_scope.container = (typeof element == 'string') ? document.querySelector(element): element
+		_scope.container.style.overflow = 'hidden'
+		
 		_scope.options = _mergeOptions({
-			'selector':'div.artois-item',
+			'selector':'div.guggenheim-item',
 			'rows':'auto',
 			'cols':'auto',
 			'duration':0.5,
 			'easing':'ease',
-			'slider':'div.artois-slider'
+			'slider':'div.guggenheim-slider'
 			},options)
 
 		_scope.elements = _scope.container.querySelectorAll(_scope.options.selector)
 		
+		if(!_scope.elements)
+			throw new Exception('Gallery is empty')
+
+		_scope.setUpElements()
+
 		var containerDimensions = _getElementDimensions(_scope.container), 
 			elDimensions, 
 			width, 
@@ -309,6 +362,7 @@
 		//set up slider
 		slider = _scope.container.querySelector(_scope.options.slider)
 		slider.style.left = 0 + "px"
+		slider.style.position = 'relative'
 
 		_scope.reset()
 
@@ -334,6 +388,12 @@
   	clearProperties[prefix + 'animation-name'] =
   	clearProperties[prefix + 'animation-duration'] = ''
 
-	global.artois = initialize
+	global.guggenheim = initialize
 
 })(this);
+
+if(!Array.isArray) {  
+  Array.isArray = function (arg) {  
+    return Object.prototype.toString.call(arg) == '[object Array]';  
+  };  
+} 

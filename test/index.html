@@ -1,69 +1,37 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>artois.js test</title>
+		<title>guggenheim.js test</title>
 		<style type="text/css">
-			#artois-container{
+			#guggenheim-container{
 				width:800px;
-				height:450px;
+				height:400px;
 				overflow:hidden;
-				background:#ccc;
-				position:relative;
 			}
 
-			.artois-slider{
-				position:relative;
-			}
 
-			.artois-item{
-				width:190px;
-				margin:5px;
-				height:125px;
-				position:absolute;
-				color:white;
-				font-size:100px;
-				text-align:center;
-				font-family:'Helvetica';
-				padding-top:15px;
-			}
-
-			.green{
-				background:green;
-			}
-
-			.blue{
-				background:blue;
-			}
-
-			.red{
-				background:red;
-			}
-
-			a{
-				cursor:pointer;
-			}
 		</style>
 	</head>
 	<body>
-		<div id="artois-container">
-			<div class="artois-slider">
-				<div class='artois-item red' id="item-1">1</div>
-				<div class='artois-item red' id="item-2">2</div>
-				<div class='artois-item blue' id="item-3">3</div>
-				<div class='artois-item green' id="item-4">4</div>
-				<div class='artois-item blue' id="item-5">5</div>
-				<div class='artois-item blue' id="item-6">6</div>
-				<div class='artois-item red' id="item-7">7</div>
-				<div class='artois-item green' id="item-8">8</div>
-				<div class='artois-item red' id="item-9">9</div>
-				<div class='artois-item green' id="item-10">10</div>
-				<div class='artois-item green' id="item-11">11</div>
-				<div class='artois-item blue' id="item-12">12</div>
-				<div class='artois-item red' id="item-13">13</div>
-				<div class='artois-item blue' id="item-14">14</div>
-				<div class='artois-item green' id="item-15">15</div>
-				<div class='artois-item red' id="item-16">16</div>
-				<div class='artois-item green' id="item-17">17</div>
+		<div id="guggenheim-container">
+			<div class="guggenheim-slider">
+				<div class='guggenheim-item red' id="item-1"><div>1</div></div>
+				<div class='guggenheim-item red' id="item-2">2</div>
+				<div class='guggenheim-item blue' id="item-3">3</div>
+				<div class='guggenheim-item green' id="item-4">4</div>
+				<div class='guggenheim-item blue' id="item-5">5</div>
+				<div class='guggenheim-item blue' id="item-6">6</div>
+				<div class='guggenheim-item red' id="item-7">7</div>
+				<div class='guggenheim-item green' id="item-8">8</div>
+				<div class='guggenheim-item red' id="item-9">9</div>
+				<div class='guggenheim-item green' id="item-10">10</div>
+				<div class='guggenheim-item green' id="item-11">11</div>
+				<div class='guggenheim-item blue' id="item-12">12</div>
+				<div class='guggenheim-item red' id="item-13">13</div>
+				<div class='guggenheim-item blue' id="item-14">14</div>
+				<div class='guggenheim-item green' id="item-15">15</div>
+				<div class='guggenheim-item red' id="item-16">16</div>
+				<div class='guggenheim-item green' id="item-17">17</div>
 			</div>
 		</div>
 
@@ -74,9 +42,9 @@
 		<a onclick='filterEls("green")'>Green</a> |
 		<a onclick='gallery.prev()'>Prev</a>
 		<a onclick='gallery.next()'>Next</a>
-		<script type="text/javascript" src="../src/js/artois.js"></script>
+		<script type="text/javascript" src="../src/js/guggenheim.js"></script>
 		<script type="text/javascript">
-			var gallery = artois('#artois-container')
+			var gallery = guggenheim('#guggenheim-container',{rows:3,cols:3})
 
 			function reorder(){
 				var order = [
@@ -102,8 +70,7 @@
 			}
 
 			function filterEls(colour){
-				re = new RegExp('(^|\\s)' + colour + '(\\s|$)')
-				gallery.filter(function(el){return re.test(el.className)})
+				gallery.filter('red|blue')
 			}
 		</script>
 	</body>
