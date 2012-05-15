@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="test.css">
+  <title>Guggenheim unit tests</title>
+  <script src="../vendor/evidence.js"></script>
+  <script src="evidence_runner.js"></script>
+  <script src="../src/polyfill.js"></script>
+  <script src="../src/zepto.js"></script>
+  <script src="../src/event.js"></script>
+  <!--<script src="../dist/zepto.min.js"></script>-->
+  <style>
+    #get_style_element {
+      font-size: 48px;
+      color: black;
+    }
+  </style>
+</head>
+<body>
+  <h1>Guggenheim unit tests</h1>
+  <p id="results">
+    Running… see browser console for results
+  </p>
+  <div id="fixtures">
+
+    <div id="guggenheim-container">
+      <div class="guggenheim-slider">
+        <div class='guggenheim-item red' id="item-1"><div>1</div></div>
+        <div class='guggenheim-item red' id="item-2">2</div>
+        <div class='guggenheim-item blue' id="item-3">3</div>
+        <div class='guggenheim-item green' id="item-4">4</div>
+        <div class='guggenheim-item blue' id="item-5">5</div>
+        <div class='guggenheim-item blue' id="item-6">6</div>
+        <div class='guggenheim-item red' id="item-7">7</div>
+        <div class='guggenheim-item green' id="item-8">8</div>
+        <div class='guggenheim-item red' id="item-9">9</div>
+        <div class='guggenheim-item green' id="item-10">10</div>
+        <div class='guggenheim-item green' id="item-11">11</div>
+        <div class='guggenheim-item blue' id="item-12">12</div>
+        <div class='guggenheim-item red' id="item-13">13</div>
+        <div class='guggenheim-item blue' id="item-14">14</div>
+        <div class='guggenheim-item green' id="item-15">15</div>
+        <div class='guggenheim-item red' id="item-16">16</div>
+        <div class='guggenheim-item green' id="item-17">17</div>
+      </div>
+    </div>
+
+  </div><!-- fixtures -->
+
+  <script>
+  (function(){
+
+    Evidence('GuggenheimTest', {
+
+      testInitialises
+
+    })
+
+  })()
+  </script>
+</body>
+</html>

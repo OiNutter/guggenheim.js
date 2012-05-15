@@ -3,7 +3,8 @@
 var fs = require('fs'),
 	sys = require('util'),
 	uglifyjs = require("uglify-js"),
-	path = require('path')
+	path = require('path'),
+	phantom = require('phantom')
 
 namespace('guggenheim', function(){
 
@@ -22,5 +23,10 @@ namespace('guggenheim', function(){
 		ast = uglifyjs.uglify.ast_squeeze(ast) // get an AST with compression optimizations
 
 		fs.writeSync(output,uglifyjs.uglify.gen_code(ast))
+	})
+
+	desc('Runs PhantomJS tests')
+	task('test',[],function(){
+		phantom.startPhantomProcess('test/runner.coffee')
 	})
 })
