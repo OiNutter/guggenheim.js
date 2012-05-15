@@ -42,7 +42,7 @@
 		<a onclick='filterEls("green")'>Green</a> |
 		<a onclick='gallery.prev()'>Prev</a>
 		<a onclick='gallery.next()'>Next</a>
-		<script type="text/javascript" src="../src/js/guggenheim.js"></script>
+		<script type="text/javascript" src="../src/guggenheim.js"></script>
 		<script type="text/javascript">
 			var gallery = guggenheim('#guggenheim-container',{rows:3,cols:3})
 
@@ -70,7 +70,7 @@
 			}
 
 			function filterEls(colour){
-				gallery.filter('red|blue')
+				gallery.filter(colour)
 			}
 		</script>
 	</body>

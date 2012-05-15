@@ -66,7 +66,7 @@ gallery.filter(class|classes|filterFunction);
 
 The `filter` function will filter the items in your gallery based on one of the 3 possible argument types.
 
-* class - If you pass a string through, guggenheim will search for elements that have a class with the same name. You can pass a list of optional classes by seperating them with the `|` character e.g. 'red|blue'.
+* class - If you pass a string through, guggenheim will search for elements that have a class with the same name. You can pass a list of optional classes by seperating them with the `|` character e.g. `'red|blue'`.
 * classes - You can also pass an array of class strings through, using the format specified by the class option. Guggenheim will filter to elements that match all supplied class strings.
 * filterFunction - Alternatively you can just pass your own function to run on each element.
 
@@ -97,10 +97,37 @@ gallery.prev();
 
 The `next` and `prev` buttons are used for paginating through the gallery.
 
+
 CSS
 ---
 
 The minimum CSS required for this to work is to specify a width and height for the gallery container. Guggenheim will add the rest of the required styles.
+
+
+Examples
+--------
+
+Check out the [demo page](http://oinutter.github.com/guggenheim.js)
+
+
+Building
+--------
+
+To build guggenheim you will need to install Jake and uglify-js.
+
+``` bash
+npm install -g jake
+npm instal uglify-js
+```
+
+Then just run
+
+``` bash
+jake guggenheim:build
+```
+
+This will minify the file and place it in the dist folder.
+
 
 License
 -------
