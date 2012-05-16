@@ -156,16 +156,15 @@
                 '#item-14',
                 '#item-8',
                 '#item-12'],
-            ids = []
+            ids = [],
+            els = []
 
-        gallery.order(order)
-        els = getVisibleElements()
-
-        els.sort(function(a,b))
-        for(var i = 0; i<els.length;i++)
+        els = gallery.order(order)
+       
+       console.log(els)
+       for(var i = 0; i<els.length;i++)
             ids.push('#' + els[i].getAttribute('id'))
       
-
         t.assertEqual(order,ids,'Elements not in correct order')
       }
 

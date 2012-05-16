@@ -237,6 +237,8 @@ var guggenheim = function(element,opts){
 
 			}
 
+			return filteredElements
+
 		},
 
 	// reorders elements according to new order
@@ -283,6 +285,8 @@ var guggenheim = function(element,opts){
 				}
 
 			}
+
+			return orderedElements
 
 		},
 
