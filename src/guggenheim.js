@@ -1,19 +1,25 @@
-;(function(global){
+var guggenheim = function(element,opts){
 
-	var _scope = this,
-		endEventName, 
+	var endEventName, 
 		endAnimationName,
     	vendors = { Webkit: 'webkit', Moz: '', O: 'o', ms: 'MS' },
     	document = window.document, 
     	testEl = document.createElement('div'),
     	supportedTransforms = /^((translate|rotate|scale)(X|Y|Z|3d)?|matrix(3d)?|perspective|skew(X|Y)?)$/i,
-    	clearProperties = {}
+    	clearProperties = {},
     	easing = {
 			ease: function(pos) { return (-Math.cos(pos*Math.PI)/2) + 0.5 },
 			linear: function(pos){ return pos }
 		},
 		animating = false,
-		prefix = ""
+		prefix = "",
+		eventPrefix = "",
+		container,
+		options,
+		slider,
+		elements,
+		filteredElements = [],
+		orderedElements = []
 
     function _downcase(str) { return str.toLowerCase() }
   	function _normalizeEvent(name) { return eventPrefix ? eventPrefix + name : _downcase(name) }
@@ -47,7 +53,7 @@
 	function _mergeOptions(destination,source){
 		var property,prop
 		for (property in source){
-			if(_getObjVars(destination[property]).length>0 && _scope._getObjVars(source[property]).length>0){
+			if(_getObjVars(destination[property]).length>0 && _getObjVars(source[property]).length>0){
 				for(prop in source[property])
 					destination[property][prop] = source[property][prop]
 			} else {
@@ -100,7 +106,7 @@
 		var transitions = [], 
 			key,
 			start = (new Date).getTime(),
-        	duration = _scope.options.duration*1000,
+        	duration = options.duration*1000,
         	finish = start + duration,
         	comp = el.currentStyle ? el.currentStyle : getComputedStyle(el, null),
         	current = {},
@@ -110,15 +116,15 @@
         	time = (new Date).getTime(),
         	pos
 
-        if(_scope.prefix != ""){
+        if(prefix != ""){
        		for(key in props)
      			transitions.push(key)
     
-     		el.style.setProperty(_scope.prefix + 'transition-property',transitions.join(', '),'')
-     		el.style.setProperty(_scope.prefix + 'transition-duration',_scope.options.duration + 's','')
-     		el.style.setProperty(_scope.prefix + 'transition-timing-function',_scope.options.easing,'');
+     		el.style.setProperty(prefix + 'transition-property',transitions.join(', '),'')
+     		el.style.setProperty(prefix + 'transition-duration',options.duration + 's','')
+     		el.style.setProperty(prefix + 'transition-timing-function',options.easing,'');
    			
-   			if(_scope.options.duration>0)
+   			if(options.duration>0)
    				_addEvent(el,_normalizeEvent('TransitionEnd'),callback)
 
      		for (key in props)
@@ -131,7 +137,7 @@
         	interval = setInterval(function(){
       	    	pos = time > finish ? 1 : (time-start)/duration
 	        	for(prop in target)
-        			el.style[prop] = target[prop].f(current[prop].v,target[prop].v,easing[_scope.options.easing](pos)) + target[prop].u
+        			el.style[prop] = target[prop].f(current[prop].v,target[prop].v,easing[options.easing](pos)) + target[prop].u
        
        			if(time>finish){
         			clearInterval(interval)
@@ -142,255 +148,263 @@
         }
     }
 
-    _scope.prev = function(){
-    	if(_scope.animating)
-    		return false
+    var prev = function(){
+    		if(animating)
+	    		return false
 
-    	_scope.animating = true
+    		animating = true
 
-    	var slider = _scope.container.querySelector(_scope.options.slider),
-    		containerDimensions = _getElementDimensions(_scope.container),
-    		elDimensions = _getElementDimensions(_scope.elements[0]),
-    		pages = Math.ceil(_scope.filteredElements.length/(_scope.options.rows*_scope.options.cols)),
-    		sliderWidth = pages * containerDimensions.width
+	    	var containerDimensions = _getElementDimensions(container),
+    			elDimensions = _getElementDimensions(elements[0]),
+    			pages = Math.ceil(filteredElements.length/(options.rows*options.cols)),
+    			sliderWidth = pages * containerDimensions.width
+    		
+    		if(parseFloat(slider.offsetLeft) != 0)
+	    		_animate(slider,{"left":(parseFloat(slider.offsetLeft) + containerDimensions.width) + 'px'},function(){animating=false})
+    		else
+	    		animating = false
 
-    	if(parseFloat(slider.offsetLeft) != 0)
-    		_animate(slider,{"left":(parseFloat(slider.offsetLeft) + containerDimensions.width) + 'px'},function(){_scope.animating=false})
-    	else
-    		_scope.animating = false
+    	},
+	next = function(){
+    		if(animating)
+    			return false
 
-    }
+    		animating = true
 
-    _scope.next = function(){
-    	if(_scope.animating)
-    		return false
+       		var containerDimensions = _getElementDimensions(container),
+    			elDimensions = _getElementDimensions(elements[0]),
+    			pages = Math.ceil(filteredElements.length/(options.rows*options.cols)),
+    			sliderWidth = pages * containerDimensions.width
 
-    	_scope.animating = true
+    		if(parseFloat(slider.offsetLeft) > -(sliderWidth - containerDimensions.width))
+	    		_animate(slider,{"left":(parseFloat(slider.offsetLeft) - containerDimensions.width) + 'px'},function(){ animating=false})
+    		else
+	    		animating = false
+    		
+    	},
 
-       	var slider = _scope.container.querySelector(_scope.options.slider),
-    		containerDimensions = _getElementDimensions(_scope.container),
-    		elDimensions = _getElementDimensions(_scope.elements[0]),
-    		pages = Math.ceil(_scope.filteredElements.length/(_scope.options.rows*_scope.options.cols)),
-    		sliderWidth = pages * containerDimensions.width
+    // runs through list of results and hides any elements that aren't in the list of results
+	filter = function(filterFunction){
+			var row = 0,
+				col = 0,
+				top,
+				left,
+				dimensions = _getElementDimensions(elements[0]),
+				containerDimensions = _getElementDimensions(container),
+				page = 0,
+				i,
+				props = {},
+				classString
 
-    	if(parseFloat(slider.offsetLeft) > -(sliderWidth - containerDimensions.width))
-    		_animate(slider,{"left":(parseFloat(slider.offsetLeft) - containerDimensions.width) + 'px'},function(){ _scope.animating=false})
-    	else
-    		_scope.animating = false
-    	
-    }
-
-	// runs through list of results and hides any elements that aren't in the list of results
-	_scope.filter = function(filterFunction){
-		var row = 0,
-			col = 0,
-			top,
-			left,
-			dimensions = _getElementDimensions(_scope.elements[0]),
-			containerDimensions = _getElementDimensions(_scope.container),
-			page = 0,
-			i,
-			props = {},
-			classString
-
-		if(typeof filterFunction == 'string' || Array.isArray(filterFunction) ){
-			classString = typeof filterFunction == 'string' ? filterFunction : '(?=.*\\b' + filterFunction.join('\\b)(?=.*\\b') + '\\b)'
-			filterFunction = function(el){ return (new RegExp('(^|\\s)' + classString + '(\\s|$)')).test(el.className)}
-		}
-
-		_scope.filteredElements = []
-
-		for(i = 0; i<_scope.orderedElements.length; i++){
-			if(filterFunction(_scope.orderedElements[i])){
-				_scope.filteredElements.push(_scope.orderedElements[i])
-				top = ((dimensions.height + dimensions.margin.bottom) * row) + dimensions.margin.top
-				left = ((dimensions.width + dimensions.margin.right) * col) + (containerDimensions.width*page) + dimensions.margin.left
-			
-				props = {
-					"top":top + "px",
-					"left": left + "px",
-					"opacity":1
-				}
-
-				col++
-
-				if(col==_scope.options.cols){
-					col = 0 
-					row++
-					if(row==_scope.options.rows){
-						row = 0
-						page++
-					}
-				}
-
-			} else {
-				props = {"opacity":0}
+			if(typeof filterFunction == 'string' || Array.isArray(filterFunction) ){
+				if(typeof filterFunction == 'string')
+					filterFunction = [filterFunction]
+				classString = '(?=.*\\b' + filterFunction.join('\\b)(?=.*\\b') + '\\b)'
+				
+				filterFunction = function(el){ return (new RegExp(classString)).test(el.className)}
 			}
 
-			_animate(_scope.orderedElements[i],props)
+			filteredElements = []
 
-		}
+			for(i = 0; i<orderedElements.length; i++){
+				if(filterFunction(orderedElements[i])){
+					filteredElements.push(orderedElements[i])
+					top = ((dimensions.height + dimensions.margin.bottom) * row) + dimensions.margin.top
+					left = ((dimensions.width + dimensions.margin.right) * col) + (containerDimensions.width*page) + dimensions.margin.left
+				
+					props = {
+						"top":top + "px",
+						"left": left + "px",
+						"opacity":1
+					}
 
-	}
+					col++
+
+					if(col==options.cols){
+						col = 0 
+						row++
+						if(row==options.rows){
+							row = 0
+							page++
+						}
+					}
+
+				} else {
+					props = {"opacity":0}
+				}
+
+				_animate(orderedElements[i],props)
+
+			}
+
+		},
 
 	// reorders elements according to new order
-	_scope.order = function(orderedResults){
+	order = function(orderedResults){
 
-		var row = 0,
-			col = 0,
-			top,
-			left,
-			dimensions = _getElementDimensions(_scope.elements[0]),
-			containerDimensions = _getElementDimensions(_scope.container),
-			page = 0,
-			i,
-			props = {},
-			el
+			var row = 0,
+				col = 0,
+				top,
+				left,
+				dimensions = _getElementDimensions(elements[0]),
+				containerDimensions = _getElementDimensions(container),
+				page = 0,
+				i,
+				props = {},
+				el
 
-		_scope.orderedElements = []
+			orderedElements = []
 
-		for(i = 0; i<orderedResults.length; i++){
-			el = _scope.container.querySelector(orderedResults[i])
-			_scope.orderedElements.push(el)
-			if(_scope.filteredElements.indexOf(el) != -1){
-				top = ((dimensions.height + dimensions.margin.bottom) * row) + dimensions.margin.top
-				left = ((dimensions.width + dimensions.margin.right) * col) + (containerDimensions.width*page) + dimensions.margin.left
-			
-				props = {
-					"top":top + "px",
-					"left": left + "px",
-					"opacity":1
-				}
+			for(i = 0; i<orderedResults.length; i++){
+				el = container.querySelector(orderedResults[i])
+				orderedElements.push(el)
+				if(filteredElements.indexOf(el) != -1){
+					top = ((dimensions.height + dimensions.margin.bottom) * row) + dimensions.margin.top
+					left = ((dimensions.width + dimensions.margin.right) * col) + (containerDimensions.width*page) + dimensions.margin.left
+				
+					props = {
+						"top":top + "px",
+						"left": left + "px",
+						"opacity":1
+					}
 
-				_animate(el,props)
+					_animate(el,props)
 
-				col++
+					col++
 
-				if(col==_scope.options.cols){
-					col = 0 
-					row++
-					if(row==_scope.options.rows){
-						row = 0
-						page++
+					if(col==options.cols){
+						col = 0 
+						row++
+						if(row==options.rows){
+							row = 0
+							page++
+						}
 					}
 				}
+
 			}
 
+		},
+
+	reset = function(){
+			var initialOrder = [],
+				i
+			filteredElements = orderedElements = []
+
+			for(i = 0;i<elements.length;i++){
+				filteredElements.push(elements[i])
+				initialOrder.push('#' + elements[i].id)
+			}
+
+			orderedElements = filteredElements
+
+			order(initialOrder)
 		}
 
-	}
-
-	_scope.reset = function(){
-		var initialOrder = []
-
-		_scope.filteredElements = _scope.orderedElements = []
-
-		for(i = 0;i<_scope.elements.length;i++){
-			_scope.filteredElements.push(_scope.elements[i])
-			initialOrder.push('#' + _scope.elements[i].id)
-		}
-
-		_scope.orderedElements = _scope.filteredElements
-
-		order(initialOrder)
-	}
-
-	_scope.setUpElements = function(){
+	
+	function setUpElements(){
 		var i,
 			width = 0,
 			height = 0,
-			containerDimensions = _getElementDimensions(_scope.container)
+			containerDimensions = _getElementDimensions(container)
 		
-		for(i=0;i<_scope.elements.length;i++){
-			dimensions = _getElementDimensions(_scope.elements[i])
+		for(i=0;i<elements.length;i++){
+			dimensions = _getElementDimensions(elements[i])
 			if(dimensions.width > width) width = dimensions.width
 			if(dimensions.height > height) height = dimensions.height
 		}
 
-		if (width>containerDimensions.width/_scope.options.cols) width = Math.floor(containerDimensions.width/_scope.options.cols)
-		if (height>containerDimensions.height/_scope.options.rows) height = Math.floor(containerDimensions.height/_scope.options.rows)
+		if (width>containerDimensions.width/options.cols) width = Math.floor(containerDimensions.width/options.cols)
+		if (height>containerDimensions.height/options.rows) height = Math.floor(containerDimensions.height/options.rows)
 
-		for(i=0;i<_scope.elements.length;i++){
-			_scope.elements[i].style.position = 'absolute'
-			_scope.elements[i].style.width = width + 'px'
-			_scope.elements[i].style.height = height + 'px'
+		for(i=0;i<elements.length;i++){
+			elements[i].style.position = 'absolute'
+			elements[i].style.width = width + 'px'
+			elements[i].style.height = height + 'px'
 		}
 	}
 	
-	function initialize(element,options){
-		if(typeof element == 'string' && document.querySelector(element)==null)
-			throw new Exception('Element ' + element + " does not exist!");
+	
+	if(typeof element == 'string' && document.querySelector(element)==null)
+		throw 'Element ' + element + " does not exist!"
 
-		_scope.container = (typeof element == 'string') ? document.querySelector(element): element
-		_scope.container.style.overflow = 'hidden'
-		
-		_scope.options = _mergeOptions({
-			'selector':'div.guggenheim-item',
-			'rows':'auto',
-			'cols':'auto',
-			'duration':0.5,
-			'easing':'ease',
-			'slider':'div.guggenheim-slider'
-			},options)
+	container = (typeof element == 'string') ? document.querySelector(element): element
+	container.style.overflow = 'hidden'
+	if(container.style.position == '') 
+		container.style.position = 'relative'
 
-		_scope.elements = _scope.container.querySelectorAll(_scope.options.selector)
-		
-		if(!_scope.elements)
-			throw new Exception('Gallery is empty')
+	options = _mergeOptions({
+		'selector':'div.guggenheim-item',
+		'rows':'auto',
+		'cols':'auto',
+		'duration':0.5,
+		'easing':'ease',
+		'slider':'div.guggenheim-slider'
+	},opts)
 
-		_scope.setUpElements()
+		elements = container.querySelectorAll(options.selector)
 
-		var containerDimensions = _getElementDimensions(_scope.container), 
-			elDimensions, 
+		if(!elements.length)
+			throw 'Gallery is empty'
+
+		setUpElements()
+
+		var containerDimensions = _getElementDimensions(container), 
+			dimensions, 
 			width, 
 			height,
 			i,
-			slider
+			slider,
+			_scope,
+			values = _getObjVars(vendors),
+  			keys = _getObjKeys(vendors)
 
-		if(_scope.options.cols == 'auto'){
-			dimensions = _getElementDimensions(_scope.elements[0])
+		if(options.cols == 'auto'){
+			dimensions = _getElementDimensions(elements[0])
 			width = dimensions.width + dimensions.margin.left + dimensions.margin.right
-			_scope.options.cols = Math.floor(containerDimensions.width/width)
+			options.cols = Math.floor(containerDimensions.width/width)
 		}
 
-		if(_scope.options.rows == 'auto'){
-			dimensions = _getElementDimensions(_scope.elements[0])
+		if(options.rows == 'auto'){
+			dimensions = _getElementDimensions(elements[0])
 			height = dimensions.height + dimensions.margin.top + dimensions.margin.bottom
-			_scope.options.rows = Math.floor(containerDimensions.height/height)
+			options.rows = Math.floor(containerDimensions.height/height)
 		}
 
 		//set up slider
-		slider = _scope.container.querySelector(_scope.options.slider)
+		slider = container.querySelector(options.slider)
 		slider.style.left = 0 + "px"
 		slider.style.position = 'relative'
+	  		
+  		;(function(){
+  			for(var i=0;i<keys.length;i++){
+	  			if (testEl.style[keys[i] + 'TransitionProperty'] !== undefined) {
+  					prefix = '-' + _downcase(keys[i]) + '-'
+      				eventPrefix = values[i]
+      				return false
+    			}
+  			}
+  		})()
 
-		_scope.reset()
+  		clearProperties[prefix + 'transition-property'] =
+  		clearProperties[prefix + 'transition-duration'] =
+  		clearProperties[prefix + 'transition-timing-function'] =
+  		clearProperties[prefix + 'animation-name'] =
+  		clearProperties[prefix + 'animation-duration'] = ''
 
-		return _scope
-	}
+  		_scope = this
 
-	(function(){
-		var values = _getObjVars(vendors),
-  			keys = _getObjKeys(vendors),
-  			i
-  		for(i=0;i<keys.length;i++){
-  			if (testEl.style[keys[i] + 'TransitionProperty'] !== undefined) {
-      			_scope.prefix = '-' + _downcase(keys[i]) + '-'
-      			_scope.eventPrefix = values[i]
-      			return false
-    		}
-  		}
-  	})()
+  		reset()
 
-  	clearProperties[prefix + 'transition-property'] =
-  	clearProperties[prefix + 'transition-duration'] =
-  	clearProperties[prefix + 'transition-timing-function'] =
-  	clearProperties[prefix + 'animation-name'] =
-  	clearProperties[prefix + 'animation-duration'] = ''
+		return {
+			"reset":reset,
+			"order":order,
+			"filter":filter,
+			"prev":prev,
+			"next":next
+		}
 
-	global.guggenheim = initialize
-
-})(this);
+}
 
 if(!Array.isArray) {  
   Array.isArray = function (arg) {  

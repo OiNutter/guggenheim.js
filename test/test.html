@@ -5,12 +5,9 @@
   <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
   <link rel="stylesheet" href="test.css">
   <title>Guggenheim unit tests</title>
-  <script src="../vendor/evidence.js"></script>
+  <script src="../vendor/evidence.min.js"></script>
   <script src="evidence_runner.js"></script>
-  <script src="../src/polyfill.js"></script>
-  <script src="../src/zepto.js"></script>
-  <script src="../src/event.js"></script>
-  <!--<script src="../dist/zepto.min.js"></script>-->
+  <script src="../src/guggenheim.js"></script>
   <style>
     #get_style_element {
       font-size: 48px;
@@ -27,19 +24,19 @@
 
     <div id="guggenheim-container">
       <div class="guggenheim-slider">
-        <div class='guggenheim-item red' id="item-1"><div>1</div></div>
+        <div class='guggenheim-item red multi' id="item-1"><div>1</div></div>
         <div class='guggenheim-item red' id="item-2">2</div>
-        <div class='guggenheim-item blue' id="item-3">3</div>
+        <div class='guggenheim-item blue multi' id="item-3">3</div>
         <div class='guggenheim-item green' id="item-4">4</div>
         <div class='guggenheim-item blue' id="item-5">5</div>
-        <div class='guggenheim-item blue' id="item-6">6</div>
-        <div class='guggenheim-item red' id="item-7">7</div>
+        <div class='guggenheim-item blue multi' id="item-6">6</div>
+        <div class='guggenheim-item red multi' id="item-7">7</div>
         <div class='guggenheim-item green' id="item-8">8</div>
         <div class='guggenheim-item red' id="item-9">9</div>
         <div class='guggenheim-item green' id="item-10">10</div>
         <div class='guggenheim-item green' id="item-11">11</div>
         <div class='guggenheim-item blue' id="item-12">12</div>
-        <div class='guggenheim-item red' id="item-13">13</div>
+        <div class='guggenheim-item red multi' id="item-13">13</div>
         <div class='guggenheim-item blue' id="item-14">14</div>
         <div class='guggenheim-item green' id="item-15">15</div>
         <div class='guggenheim-item red' id="item-16">16</div>
@@ -47,14 +44,130 @@
       </div>
     </div>
 
+    <div id="empty-container"></div>
+
   </div><!-- fixtures -->
 
   <script>
   (function(){
 
+    Evidence.Assertions.assertSucceeds = function(func,message){
+      var excepted = false,
+          correctExceptionMessage = false,
+          received = ""
+
+      try{
+        func()
+      } catch(e) {
+        excepted = true
+        received = e
+      }
+
+      this._assertExpression(!excepted,message || 'Failed assertion.', 'Expected pass got %o.', excepted ? 'exception: ' + received : 'pass')
+
+    }
+
+    Evidence.Assertions.assertExcepts = function(func,expectedException,message){
+      var excepted = false,
+          correctExceptionMessage = false,
+          received = ""
+
+      try{
+        func()
+      } catch(e) {
+        excepted = true
+        received = e
+        if(e == expectedException) correctExceptionMessage = true
+      }
+
+      this._assertExpression(excepted && correctExceptionMessage,message || 'Failed assertion.', 'Expected exception %o, got %o.',expectedException, excepted ? 'exception: ' + received : 'pass')
+
+    }
+
+    function getVisibleElements(){
+      var elements = document.querySelectorAll('.guggenheim-item'),
+          i,
+          visible = []
+
+      for(i=0;i<elements.length;i++)
+        if(elements[i].style.opacity==1) visible.push(elements[i])
+      
+      return visible
+    }
+
     Evidence('GuggenheimTest', {
 
-      testInitialises
+      testInitialises: function(t){
+        // Check initialises correctly from string
+        var container = document.querySelector('#guggenheim-container'),
+            gallery = guggenheim('#guggenheim-container')
+
+        t.assertSucceeds(function(){guggenheim('#guggenheim-container')},'Failed to initialise when passed a string')
+        t.assertSucceeds(function(){guggenheim(document.querySelector('#guggenheim-container'))},'Failed to initialise when passed a DOM element')
+       
+      },
+
+      testExceptsWhenGivenBadElement: function(t){
+        t.assertExcepts(function(){guggenheim('#missing')},'Element #missing does not exist!','Failed to except when passed non existant ID')
+      },
+
+      testExceptsWhenGivenEmptyContainer: function(t){
+        t.assertExcepts(function(){guggenheim('#empty-container')},'Gallery is empty','Failed to except when passed an empty gallery')
+      },
+
+      testFiltering: function(t){
+        var gallery = guggenheim('#guggenheim-container'),
+            els
+
+        // Filter to red items
+        gallery.filter('red')
+        els = getVisibleElements()
+        t.assertEqual(6,els.length,'Filtered to incorrect number of red elements')
+
+        // Filter to red and blue items
+        gallery.filter('red|blue')
+        els = getVisibleElements()
+        t.assertEqual(11,els.length,'Filtered to incorrect number of red or blue elements')      
+
+        //  Filter to red multi items
+        gallery.filter(['red','multi'])
+        els = getVisibleElements()
+        t.assertEqual(3,els.length,'Filtered to incorrect number of red and multi elements')      
+
+      },
+
+      testOrdering: function(t){
+        var gallery = guggenheim('#guggenheim-container')
+            order = [
+                '#item-4',
+                '#item-11',
+                '#item-9',
+                '#item-15',
+                '#item-3',
+                '#item-1',
+                '#item-13',
+                '#item-6',
+                '#item-5',
+                '#item-17',
+                '#item-7',
+                '#item-16',
+                '#item-2',
+                '#item-10',
+                '#item-14',
+                '#item-8',
+                '#item-12'],
+            ids = []
+
+        gallery.order(order)
+        els = getVisibleElements()
+
+        els.sort(function(a,b))
+        for(var i = 0; i<els.length;i++)
+            ids.push('#' + els[i].getAttribute('id'))
+      
+
+        t.assertEqual(order,ids,'Elements not in correct order')
+      }
 
     })
 
