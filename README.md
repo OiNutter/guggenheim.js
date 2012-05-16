@@ -3,10 +3,6 @@ Guggenheim.js
 
 Guggenheim.js is a framework agnostic plugin for creating sexy interactive galleries. It uses CSS3 animation (with a fallback to Javascript) to create animated filtering, reordering and pagination of your gallery.
 
-Build Status
-------------
-
-[![Build Status](https://secure.travis-ci.org/OiNutter/guggenheim.js.png)](http://travis-ci.org/OiNutter/guggenheim.js)
 
 Usage
 -----
@@ -57,6 +53,8 @@ Where element is either the css selector of the container, or the actual DOM ele
 * duration - `0.5` - How long each animation should last.
 * easing - `ease` - Exasing type for animations, currently supports `ease` and `linear`.
 * slider - `div.guggenheim-slider` - CSS selector for the internal wrapper element used for the gallery pagination.
+* width - `null` - Integer width for the container in pixels. If null will expect there to be a width set in the css.
+* height - `null` - Integer height for the container in pixels. If null will expect there to be a height set in the css.
 
 Once you have your gallery initialised you can manipulate it by calling one of the methods detailed below on it.
 
@@ -106,7 +104,7 @@ The `next` and `prev` buttons are used for paginating through the gallery.
 CSS
 ---
 
-The minimum CSS required for this to work is to specify a width and height for the gallery container. Guggenheim will add the rest of the required styles.
+The minimum CSS required for this to work is to specify a width and height for the gallery container. You can either set these in CSS or pass them as options to Guggenheim. Guggenheim will add the rest of the required styles.
 
 
 Examples
@@ -117,6 +115,8 @@ Check out the [demo page](http://oinutter.github.com/guggenheim.js)
 
 Building
 --------
+
+[![Build Status](https://secure.travis-ci.org/OiNutter/guggenheim.js.png)](http://travis-ci.org/OiNutter/guggenheim.js)
 
 To build guggenheim you will need to install Jake and uglify-js.
 
@@ -133,6 +133,15 @@ jake guggenheim:build
 
 This will minify the file and place it in the dist folder.
 
+Contributing
+------------
+
+Please feel free to fork, fiddle, play with this as much as you like. If you add something useful or fix something broken and think it should be in the main repository then please by all means send me a Pull Request and I'll take a look. If possible please add tests.
+
+TODO
+----
+
+* Add more tests
 
 License
 -------
