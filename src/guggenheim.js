@@ -333,72 +333,82 @@ var guggenheim = function(element,opts){
 		throw 'Element ' + element + " does not exist!"
 
 	container = (typeof element == 'string') ? document.querySelector(element): element
-	container.style.overflow = 'hidden'
-	if(container.style.position == '') 
-		container.style.position = 'relative'
-
+	
 	options = _mergeOptions({
 		'selector':'div.guggenheim-item',
 		'rows':'auto',
 		'cols':'auto',
 		'duration':0.5,
 		'easing':'ease',
-		'slider':'div.guggenheim-slider'
+		'slider':'div.guggenheim-slider',
+		'width':null,
+		'height':null,
 	},opts)
 
-		elements = container.querySelectorAll(options.selector)
+	//set up container
+	container.style.overflow = 'hidden'
+	if(container.style.position == '') 
+		container.style.position = 'relative'
 
-		if(!elements.length)
-			throw 'Gallery is empty'
+	if(options.width != null)
+		container.style.width = options.width + 'px'
 
-		setUpElements()
+	if(options.height != null)
+		container.style.height = options.height + 'px'
 
-		var containerDimensions = _getElementDimensions(container), 
-			dimensions, 
-			width, 
-			height,
-			i,
-			slider,
-			_scope,
-			values = _getObjVars(vendors),
-  			keys = _getObjKeys(vendors)
+	//set up elements
+	elements = container.querySelectorAll(options.selector)
 
-		if(options.cols == 'auto'){
-			dimensions = _getElementDimensions(elements[0])
-			width = dimensions.width + dimensions.margin.left + dimensions.margin.right
-			options.cols = Math.floor(containerDimensions.width/width)
-		}
+	if(!elements.length)
+		throw 'Gallery is empty'
 
-		if(options.rows == 'auto'){
-			dimensions = _getElementDimensions(elements[0])
-			height = dimensions.height + dimensions.margin.top + dimensions.margin.bottom
-			options.rows = Math.floor(containerDimensions.height/height)
-		}
+	setUpElements()
 
-		//set up slider
-		slider = container.querySelector(options.slider)
-		slider.style.left = 0 + "px"
-		slider.style.position = 'relative'
+	var containerDimensions = _getElementDimensions(container), 
+		dimensions, 
+		width, 
+		height,
+		i,
+		slider,
+		_scope,
+		values = _getObjVars(vendors),
+  		keys = _getObjKeys(vendors)
+
+  	//calc rows and columns
+	if(options.cols == 'auto'){
+		dimensions = _getElementDimensions(elements[0])
+		width = dimensions.width + dimensions.margin.left + dimensions.margin.right
+		options.cols = Math.floor(containerDimensions.width/width)
+	}
+
+	if(options.rows == 'auto'){
+		dimensions = _getElementDimensions(elements[0])
+		height = dimensions.height + dimensions.margin.top + dimensions.margin.bottom
+		options.rows = Math.floor(containerDimensions.height/height)
+	}
+
+	//set up slider
+	slider = container.querySelector(options.slider)
+	slider.style.left = 0 + "px"
+	slider.style.position = 'relative'
 	  		
-  		;(function(){
-  			for(var i=0;i<keys.length;i++){
-	  			if (testEl.style[keys[i] + 'TransitionProperty'] !== undefined) {
-  					prefix = '-' + _downcase(keys[i]) + '-'
-      				eventPrefix = values[i]
-      				return false
-    			}
+	;(function(){
+		for(var i=0;i<keys.length;i++){
+ 			if (testEl.style[keys[i] + 'TransitionProperty'] !== undefined) {
+				prefix = '-' + _downcase(keys[i]) + '-'
+   				eventPrefix = values[i]
+   				return false
   			}
-  		})()
+		}
+	})()
 
-  		clearProperties[prefix + 'transition-property'] =
-  		clearProperties[prefix + 'transition-duration'] =
-  		clearProperties[prefix + 'transition-timing-function'] =
-  		clearProperties[prefix + 'animation-name'] =
-  		clearProperties[prefix + 'animation-duration'] = ''
+	clearProperties[prefix + 'transition-property'] =
+	clearProperties[prefix + 'transition-duration'] =
+	clearProperties[prefix + 'transition-timing-function'] =
+	clearProperties[prefix + 'animation-name'] =
+	clearProperties[prefix + 'animation-duration'] = ''
 
-  		_scope = this
-
-  		reset()
+  	reset()
 
 		return {
 			"reset":reset,
