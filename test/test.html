@@ -84,6 +84,27 @@
 
     }
 
+    Evidence.Assertions.assertArraysEqual = function(a,b,message){
+        var result = false,
+            i,
+            curr = true
+
+        if(a==b)
+          result = true
+        
+        if(!result && a.length==b.length){
+          for(i=0;i<a.length;i++){
+            if(a[i]!=b[i]){
+              curr=false
+              break
+            }
+          }
+          result = curr
+        }
+
+        this._assertExpression(result,message || ' Failed assertion', 'Expected %o to equal %o', a,b)
+    }
+
     function getVisibleElements(){
       var elements = document.querySelectorAll('.guggenheim-item'),
           i,
@@ -161,11 +182,10 @@
 
         els = gallery.order(order)
        
-       console.log(els)
        for(var i = 0; i<els.length;i++)
             ids.push('#' + els[i].getAttribute('id'))
       
-        t.assertEqual(order,ids,'Elements not in correct order')
+        t.assertArraysEqual(order,ids,'Elements not in correct order')
       }
 
     })
