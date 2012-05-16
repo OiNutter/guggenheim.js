@@ -3,6 +3,11 @@ Guggenheim.js
 
 Guggenheim.js is a framework agnostic plugin for creating sexy interactive galleries. It uses CSS3 animation (with a fallback to Javascript) to create animated filtering, reordering and pagination of your gallery.
 
+Build Status
+------------
+
+[![Build Status](https://secure.travis-ci.org/OiNutter/guggenheim.js.png)](http://travis-ci.org/OiNutter/guggenheim.js)
+
 Usage
 -----
 
