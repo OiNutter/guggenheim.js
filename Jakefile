@@ -4,7 +4,7 @@ var fs = require('fs'),
 	sys = require('util'),
 	uglifyjs = require("uglify-js"),
 	path = require('path'),
-	phantom = require('phantom')
+	exec = require('child_process').exec;
 
 namespace('guggenheim', function(){
 
@@ -27,6 +27,7 @@ namespace('guggenheim', function(){
 
 	desc('Runs PhantomJS tests')
 	task('test',[],function(){
-		phantom.startPhantomProcess('test/runner.coffee')
+		function puts(error, stdout, stderr) { sys.puts(stdout) }
+		exec('phantomjs test/runner.coffee',puts)
 	})
 })
