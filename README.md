@@ -142,6 +142,7 @@ TODO
 ----
 
 * Add more tests
+* Support for numbered pagination and automatic pagination generation
 
 License
 -------
