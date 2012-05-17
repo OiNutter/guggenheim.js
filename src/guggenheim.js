@@ -206,6 +206,8 @@ var guggenheim = function(element,opts){
 
 			filteredElements = []
 
+			_animate(slider,{"left":'0px'})
+
 			for(i = 0; i<orderedElements.length; i++){
 				if(filterFunction(orderedElements[i])){
 					filteredElements.push(orderedElements[i])
