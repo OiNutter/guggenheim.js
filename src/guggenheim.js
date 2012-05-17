@@ -212,7 +212,7 @@ var guggenheim = function(element,opts){
 
 			filteredElements = []
 
-			_animate(slider,{"left":'0px'})
+			_animate(slider,{"left":containerDimensions.padding.left + 'px'})
 
 			for(i = 0; i<orderedElements.length; i++){
 				if(filterFunction(orderedElements[i])){
