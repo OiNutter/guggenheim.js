@@ -260,7 +260,7 @@ var guggenheim = function(element,opts){
 			orderedElements = []
 
 			for(i = 0; i<orderedResults.length; i++){
-				el = container.querySelector(orderedResults[i])
+				el = (typeof orderedResults[i] == 'string') ? container.querySelector(orderedResults[i]) : orderedResults[i]
 				orderedElements.push(el)
 				if(filteredElements.indexOf(el) != -1){
 					top = ((dimensions.height + dimensions.margin.bottom) * row) + dimensions.margin.top
@@ -299,7 +299,7 @@ var guggenheim = function(element,opts){
 
 			for(i = 0;i<elements.length;i++){
 				filteredElements.push(elements[i])
-				initialOrder.push('#' + elements[i].id)
+				initialOrder.push(elements[i])
 			}
 
 			orderedElements = filteredElements
