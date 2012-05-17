@@ -1,0 +1,43 @@
+/* ----------------------------------------------------
+   created with http://www.texturepacker.com 
+   ----------------------------------------------------
+   $TexturePacker:SmartUpdate:1e54c8bd845f8f002f6721b841c6fa63$
+   ----------------------------------------------------
+
+   usage: <span class="{-spritename-} sprite"></span>
+
+   replace {-spritename-} with the sprite you like to use
+
+*/
+
+.sprite {width:155px; height:226px; display:inline-block; overflow:hidden; background-repeat: no-repeat;background-image:url("../img/spritesheet.png");}
+
+.antman {background-position: -2px -2px}
+.batman {background-position: -159px -2px}
+.captain-america {background-position: -316px -2px}
+.colossus {background-position: -473px -2px}
+.cyclops {background-position: -630px -2px}
+.gambit {background-position: -787px -2px}
+.green-lantern {background-position: -2px -230px}
+.hawkeye {background-position: -159px -230px}
+.hawkman {background-position: -316px -230px}
+.hulk {background-position: -473px -230px}
+.human-torch {background-position: -630px -230px}
+.invisible-woman {background-position: -787px -230px}
+.iron-man {background-position: -2px -458px}
+.jean-grey {background-position: -159px -458px}
+.martian-manhunter {background-position: -316px -458px}
+.mr-fantastic {background-position: -473px -458px}
+.nightcrawler {background-position: -630px -458px}
+.nightwing {background-position: -787px -458px}
+.professor-x {background-position: -2px -686px}
+.rogue {background-position: -159px -686px}
+.scarlet-witch {background-position: -316px -686px}
+.spiderman {background-position: -473px -686px}
+.storm {background-position: -630px -686px}
+.superman {background-position: -787px -686px}
+.thing {background-position: -2px -914px}
+.thor {background-position: -159px -914px}
+.wasp {background-position: -316px -914px}
+.wolverine {background-position: -473px -914px}
+.wonder-woman {background-position: -630px -914px}
