@@ -32,3 +32,5 @@ RCSLOG
 SCCS
 _$*
 .project
+*.sublime-*
+node_modules
