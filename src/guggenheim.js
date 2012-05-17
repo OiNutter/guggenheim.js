@@ -74,6 +74,12 @@ var guggenheim = function(element,opts){
 					"right": (parseFloat(style.marginRight) || 0),
 					"bottom": (parseFloat(style.marginBottom) || 0),
 					"left": (parseFloat(style.marginLeft) || 0)
+				},
+			"padding":{
+					"top": (parseFloat(style.paddingTop) || 0),
+					"right": (parseFloat(style.paddingRight) || 0),
+					"bottom": (parseFloat(style.paddingBottom) || 0),
+					"left": (parseFloat(style.paddingLeft) || 0)
 				}
 		}
 	}
@@ -158,9 +164,9 @@ var guggenheim = function(element,opts){
     			elDimensions = _getElementDimensions(elements[0]),
     			pages = Math.ceil(filteredElements.length/(options.rows*options.cols)),
     			sliderWidth = pages * containerDimensions.width
-    		
-    		if(parseFloat(slider.offsetLeft) != 0)
-	    		_animate(slider,{"left":(parseFloat(slider.offsetLeft) + containerDimensions.width) + 'px'},function(){animating=false})
+
+    		if(parseFloat(slider.style.left) != containerDimensions.padding.left)
+	    		_animate(slider,{"left":(parseFloat(slider.offsetLeft) + containerDimensions.width - containerDimensions.padding.left) + 'px'},function(){animating=false})
     		else
 	    		animating = false
 
@@ -175,9 +181,9 @@ var guggenheim = function(element,opts){
     			elDimensions = _getElementDimensions(elements[0]),
     			pages = Math.ceil(filteredElements.length/(options.rows*options.cols)),
     			sliderWidth = pages * containerDimensions.width
-
-    		if(parseFloat(slider.offsetLeft) > -(sliderWidth - containerDimensions.width))
-	    		_animate(slider,{"left":(parseFloat(slider.offsetLeft) - containerDimensions.width) + 'px'},function(){ animating=false})
+    	
+    		if(parseFloat(slider.style.left) > -(sliderWidth - containerDimensions.width - containerDimensions.padding.left - containerDimensions.padding.right))
+	    		_animate(slider,{"left":(parseFloat(slider.offsetLeft) - containerDimensions.width-containerDimensions.padding.left) + 'px'},function(){ animating=false})
     		else
 	    		animating = false
     		
@@ -264,7 +270,7 @@ var guggenheim = function(element,opts){
 				orderedElements.push(el)
 				if(filteredElements.indexOf(el) != -1){
 					top = ((dimensions.height + dimensions.margin.bottom) * row) + dimensions.margin.top
-					left = ((dimensions.width + dimensions.margin.right) * col) + (containerDimensions.width*page) + dimensions.margin.left
+					left = ((dimensions.width + dimensions.margin.right) * col) + ((containerDimensions.width)*page) + dimensions.margin.left
 				
 					props = {
 						"top":top + "px",
@@ -348,7 +354,7 @@ var guggenheim = function(element,opts){
 	},opts)
 
 	//set up container
-	container.style.overflow = 'hidden'
+	//container.style.overflow = 'hidden'
 	if(container.style.position == '') 
 		container.style.position = 'relative'
 
@@ -391,7 +397,7 @@ var guggenheim = function(element,opts){
 
 	//set up slider
 	slider = container.querySelector(options.slider)
-	slider.style.left = 0 + "px"
+	slider.style.left = containerDimensions.padding.left + "px"
 	slider.style.position = 'relative'
 	  		
 	;(function(){
