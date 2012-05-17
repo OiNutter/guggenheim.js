@@ -19,7 +19,7 @@ namespace('guggenheim', function(){
 			final_code = "",
 			output = fs.openSync('dist/guggenheim.min.js','w+')
 	
-
+		ast = uglifyjs.uglify.ast_mangle(ast); // get a new AST with mangled names
 		ast = uglifyjs.uglify.ast_squeeze(ast) // get an AST with compression optimizations
 
 		fs.writeSync(output,uglifyjs.uglify.gen_code(ast))
