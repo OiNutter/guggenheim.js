@@ -99,7 +99,7 @@ body{
 		bottom:10px;
 	}
 
-	.buttons a{
+	.buttons a, a.button{
 		cursor:pointer;
 		display:inline-block;
 		padding:5px;
