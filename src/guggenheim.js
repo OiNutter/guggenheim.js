@@ -322,8 +322,8 @@ var guggenheim = function(element,opts){
 		
 		for(i=0;i<elements.length;i++){
 			dimensions = _getElementDimensions(elements[i])
-			if(dimensions.width > width) width = dimensions.width
-			if(dimensions.height > height) height = dimensions.height
+			if(dimensions.width > width) width = dimensions.width - dimensions.padding.left - dimensions.padding.right
+			if(dimensions.height > height) height = dimensions.height - dimensions.padding.top - dimensions.padding.bottom
 		}
 
 		if (width>containerDimensions.width/options.cols) width = Math.floor(containerDimensions.width/options.cols)
