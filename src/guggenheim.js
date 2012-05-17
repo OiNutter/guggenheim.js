@@ -1,3 +1,10 @@
+/*
+ * Guggenheim.js 0.1
+ * (c) 2012 Will McKenzie
+ * Provided under the MIT License
+ * See http://github.com/OiNutter/guggenheim.js for more details
+ */
+
 var guggenheim = function(element,opts){
 
 	var endEventName, 
