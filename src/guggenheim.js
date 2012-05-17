@@ -354,7 +354,7 @@ var guggenheim = function(element,opts){
 	},opts)
 
 	//set up container
-	//container.style.overflow = 'hidden'
+	container.style.overflow = 'hidden'
 	if(container.style.position == '') 
 		container.style.position = 'relative'
 
