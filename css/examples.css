@@ -110,6 +110,10 @@ body{
 		font-weight:bold;
 	}
 
+	a.button.current{
+		background:#06f;
+	}
+
 	.guggenheim-item{
 		width:155px;
 		height:225px;

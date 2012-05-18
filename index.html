@@ -37,7 +37,7 @@
 				<div class="guggenheim-item dc male powers justiceleague 195511"><span class="sprite martian-manhunter"></span></div>
 				<div class="guggenheim-item marvel male powers fantasticfour 196111"><span class="sprite mr-fantastic"></span></div>
 				<div class="guggenheim-item marvel male powers xmen 197505"><span class="sprite nightcrawler"></span></div>
-				<div class="guggenheim-item dc male nopowers justiceleague 199509"><span class="sprite nightwing"></span></div>
+				<div class="guggenheim-item dc male nopowers nogroup 199509"><span class="sprite nightwing"></span></div>
 				<div class="guggenheim-item marvel male powers xmen 196309"><span class="sprite professor-x"></span></div>
 				<div class="guggenheim-item marvel female powers xmen 198111"><span class="sprite rogue"></span></div>
 				<div class="guggenheim-item marvel female powers avengers 196403"><span class="sprite scarlet-witch"></span></div>
@@ -57,7 +57,9 @@
 		</div>
 		
 		<h2>Order</h2>
-		<a onclick="orderByAppearance()" class="button">Order By First Appearance</a>
+		<a onclick="orderAlphabetically()" class="button order-bt current alphabetical">Order Alphabetically</a>
+		<a onclick="orderByAppearance()" class="button order-bt appearance">Order By First Appearance</a>
+		<a onclick="orderByTeam()" class="button order-bt team">Order By Team</a>
 
 		<hr/>
 
@@ -147,12 +149,14 @@
 
 				<label>
 					<input type="checkbox" value="nogroup" name="nogroup" onclick="toggleCheckboxes(this); filterGallery()" class="team">
-					No Team Affiliation
+					Other / None
 				</label>
 
 			</div>
 		
 		</form>
+
+		<p>The filters are set up so that a character must match each of the different filters set. The team affiliate is demonstrating the optional filtering in that a character just has to be in one of the teams you select. You can set your filters up however you choose, using whatever elements you want. All that matters to guggenheim is how you pass them through. Check out the description of the <a href="https://github.com/OiNutter/guggenheim.js#filter">filter</a> method for more info.</p>
 
 		<hr/>
 
@@ -184,18 +188,60 @@
 			$('input[name="gender"]').val([''])
 			$('input[name="powered"]').val([''])
 			$('input[type="checkbox"]').val([''])
+			$('.order-bt.current').removeClass('current')
+			$('.order-bt.alphabetical').addClass('current')
 			gallery.reset()
 		}
 
-		function orderByAppearance(){
+		function orderAlphabetically(){
+			
 			var els = $('.guggenheim-item')
 
+			$('.order-bt.current').removeClass('current')
+			$('.order-bt.alphabetical').addClass('current')
+
 			els.sort(function(a,b){
-				var dateReg = new RegExp('[0-9]{6}'),
-					dateA = parseInt(dateReg.exec(a.className)[0]),
+				var nameA = $('span',a)[0].className.replace('sprite ',''),
+					nameB = $('span',b)[0].className.replace('sprite ',''),
+					names = [nameA,nameB].sort()
+
+				return names.indexOf(nameA) - names.indexOf(nameB)
+			})
+
+			gallery.order(els)
+
+		}
+
+		function orderByAppearance(){
+			var els = $('.guggenheim-item'),
+				dateReg = new RegExp('[0-9]{6}')
+
+			$('.order-bt.current').removeClass('current')
+			$('.order-bt.appearance').addClass('current')
+
+			els.sort(function(a,b){
+					var dateA = parseInt(dateReg.exec(a.className)[0]),
 					dateB = parseInt(dateReg.exec(b.className)[0])
 
 				return dateA - dateB
+			})
+
+			gallery.order(els)
+		}
+
+		function orderByTeam(){
+			var els = $('.guggenheim-item'),
+				teamReg = new RegExp('(avengers|fantasticfour|justiceleague|xmen|nogroup)')
+
+			$('.order-bt.current').removeClass('current')
+			$('.order-bt.team').addClass('current')
+
+			els.sort(function(a,b){
+				var teamA = teamReg.exec(a.className)[1],
+					teamB = teamReg.exec(b.className)[1],
+					teams = [teamA,teamB].sort()
+
+				return teams.indexOf(teamA) - teams.indexOf(teamB)
 			})
 
 			gallery.order(els)
