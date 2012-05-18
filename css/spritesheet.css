@@ -1,7 +1,7 @@
 /* ----------------------------------------------------
    created with http://www.texturepacker.com 
    ----------------------------------------------------
-   $TexturePacker:SmartUpdate:1e54c8bd845f8f002f6721b841c6fa63$
+   $TexturePacker:SmartUpdate:ab6b242759cd41b6bee1ba56a80ed408$
    ----------------------------------------------------
 
    usage: <span class="{-spritename-} sprite"></span>
@@ -10,34 +10,35 @@
 
 */
 
-.sprite {width:155px; height:226px; display:inline-block; overflow:hidden; background-repeat: no-repeat;background-image:url("../img/spritesheet.png");}
+.sprite {display:inline-block; overflow:hidden; background-repeat: no-repeat;background-image:url(spritesheet.png);}
 
-.antman {background-position: -2px -2px}
-.batman {background-position: -159px -2px}
-.captain-america {background-position: -316px -2px}
-.colossus {background-position: -473px -2px}
-.cyclops {background-position: -630px -2px}
-.gambit {background-position: -787px -2px}
-.green-lantern {background-position: -2px -230px}
-.hawkeye {background-position: -159px -230px}
-.hawkman {background-position: -316px -230px}
-.hulk {background-position: -473px -230px}
-.human-torch {background-position: -630px -230px}
-.invisible-woman {background-position: -787px -230px}
-.iron-man {background-position: -2px -458px}
-.jean-grey {background-position: -159px -458px}
-.martian-manhunter {background-position: -316px -458px}
-.mr-fantastic {background-position: -473px -458px}
-.nightcrawler {background-position: -630px -458px}
-.nightwing {background-position: -787px -458px}
-.professor-x {background-position: -2px -686px}
-.rogue {background-position: -159px -686px}
-.scarlet-witch {background-position: -316px -686px}
-.spiderman {background-position: -473px -686px}
-.storm {background-position: -630px -686px}
-.superman {background-position: -787px -686px}
-.thing {background-position: -2px -914px}
-.thor {background-position: -159px -914px}
-.wasp {background-position: -316px -914px}
-.wolverine {background-position: -473px -914px}
-.wonder-woman {background-position: -630px -914px}
+.antman {width:155px; height:226px; background-position: -2px -2px}
+.batman {width:155px; height:226px; background-position: -159px -2px}
+.captain-america {width:155px; height:226px; background-position: -316px -2px}
+.colossus {width:155px; height:226px; background-position: -473px -2px}
+.cyclops {width:155px; height:226px; background-position: -630px -2px}
+.flash {width:155px; height:226px; background-position: -787px -2px}
+.gambit {width:155px; height:226px; background-position: -2px -230px}
+.green-lantern {width:155px; height:226px; background-position: -159px -230px}
+.hawkeye {width:155px; height:226px; background-position: -316px -230px}
+.hawkman {width:155px; height:226px; background-position: -473px -230px}
+.hulk {width:155px; height:226px; background-position: -630px -230px}
+.human-torch {width:155px; height:226px; background-position: -787px -230px}
+.invisible-woman {width:155px; height:226px; background-position: -2px -458px}
+.iron-man {width:155px; height:226px; background-position: -159px -458px}
+.jean-grey {width:155px; height:226px; background-position: -316px -458px}
+.martian-manhunter {width:155px; height:226px; background-position: -473px -458px}
+.mr-fantastic {width:155px; height:226px; background-position: -630px -458px}
+.nightcrawler {width:155px; height:226px; background-position: -787px -458px}
+.nightwing {width:155px; height:226px; background-position: -2px -686px}
+.professor-x {width:155px; height:226px; background-position: -159px -686px}
+.rogue {width:155px; height:226px; background-position: -316px -686px}
+.scarlet-witch {width:155px; height:226px; background-position: -473px -686px}
+.spiderman {width:155px; height:226px; background-position: -630px -686px}
+.storm {width:155px; height:226px; background-position: -787px -686px}
+.superman {width:155px; height:226px; background-position: -2px -914px}
+.thing {width:155px; height:226px; background-position: -159px -914px}
+.thor {width:155px; height:226px; background-position: -316px -914px}
+.wasp {width:155px; height:226px; background-position: -473px -914px}
+.wolverine {width:155px; height:226px; background-position: -630px -914px}
+.wonder-woman {width:155px; height:226px; background-position: -787px -914px}
