@@ -91,6 +91,7 @@ body{
 		padding:10px;
 		text-align:center;
 		position:relative;
+		overflow:hidden;
 	}
 
 	.buttons{
