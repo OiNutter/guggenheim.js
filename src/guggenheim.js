@@ -258,7 +258,7 @@ var guggenheim = function(element,opts){
 			if(typeof filterFunction == 'string' || Array.isArray(filterFunction) ){
 				if(typeof filterFunction == 'string')
 					filterFunction = [filterFunction]
-				classString = '(?=.*\\b' + filterFunction.join('\\b)(?=.*\\b') + '\\b)'
+				classString = '(?=.*\\b(' + filterFunction.join(')\\b)(?=.*\\b(') + ')\\b)'
 				
 				filterFunction = function(el){ return (new RegExp(classString)).test(el.className)}
 			}
