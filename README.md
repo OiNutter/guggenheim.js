@@ -73,6 +73,8 @@ The `filter` function will filter the items in your gallery based on one of the 
 * classes - You can also pass an array of class strings through, using the format specified by the class option. Guggenheim will filter to elements that match all supplied class strings.
 * filterFunction - Alternatively you can just pass your own function to run on each element.
 
+`filter` will return an array of the matching elements
+
 
 ### Order ###
 
@@ -80,7 +82,9 @@ The `filter` function will filter the items in your gallery based on one of the 
 gallery.order(newOrder);
 ```
 
-The `order` function will reorder the elements according to the order passed through to it. `newOrder` should be an array of css selectors that will uniquely identify each element, such as ids.
+The `order` function will reorder the elements according to the order passed through to it. `newOrder` should be an array of css selectors that will uniquely identify each element, such as ids, or an array of DOM elements.
+
+`order` will return an array of the re-ordered elements
 
 
 ### Reset ###
