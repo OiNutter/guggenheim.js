@@ -26,7 +26,12 @@ var guggenheim = function(element,opts){
 		slider,
 		elements,
 		filteredElements = [],
-		orderedElements = []
+		orderedElements = [],
+		supportsOpacity = typeof testEl.style.opacity == 'string', 
+    	supportsFilters = typeof testEl.style.filter == 'string',
+    	reOpacity = /alpha\(opacity=([^\)]+)\)/, 
+    	setOpacity = function(){ }, 
+    	getOpacityFromComputed = function(){ return '1' }
 
     function _downcase(str) { return str.toLowerCase() }
   	function _normalizeEvent(name) { return eventPrefix ? eventPrefix + name : _downcase(name) }
@@ -105,14 +110,46 @@ var guggenheim = function(element,opts){
 			el.detachEvent(event,callback)
 	}
 
+	if (supportsOpacity) {
+    	setOpacity = function(el, value){ el.style.opacity = parseFloat(value) }
+    	getOpacityFromComputed = function(computed) { return computed.opacity }
+  	} else if (supportsFilters) {
+    	setOpacity = function(el, value){
+      		var es = el.style
+      		value = parseFloat(value)
+      		if (reOpacity.test(es.filter)) {
+        		value = value >= 0.9999 ? '' : ('alpha(opacity=' + (value * 100) + ')')
+        		es.filter = es.filter.replace(reOpacity, value)
+      		} else {
+        		es.filter += ' alpha(opacity=' + (value * 100) + ')'
+      		}
+    	}
+    	getOpacityFromComputed = function(comp) {
+      		var m = comp.filter.match(reOpacity)
+      		return (m ? (m[1] / 100) : 1) + ''
+    	}
+  	}
+
 	function _interpolate(source,target,pos){
-    	return (source+(target-source)*pos).toFixed(3)
+    	return parseFloat(source+(target-source)*pos).toFixed(3)
     }
+
+    function _s(str, p, c){ return str.substr(p,c||1); }
+  	
+  	function _color(source,target,pos){
+	    var i = 2, j, c, tmp, v = [], r = [];
+	    while(j=3,c=arguments[i-1],i--)
+      	if(_s(c,0)=='r') { c = c.match(/\d+/g); while(j--) v.push(~~c[j]); } else {
+	        if(c.length==4) c='#'+_s(c,1)+_s(c,1)+_s(c,2)+_s(c,2)+_s(c,3)+_s(c,3);
+        	while(j--) v.push(parseInt(_s(c,1+j*2,2), 16)); }
+    	while(j--) { tmp = ~~(v[j+3]+(v[j]-v[j+3])*pos); r.push(tmp<0?0:tmp>255?255:tmp); }
+    	return 'rgb('+r.join(',')+')';
+  	}
 
     function _parseProps(prop){
      	var p = parseFloat(prop), q = prop.replace(/^[\-\d\.]+/,'')
-     	return isNaN(p) ? { v: q, f: color, u: ''} : { v: p, f: _interpolate, u: q }
-   }
+     	return isNaN(p) ? { v: q, f: _color, u: ''} : { v: p, f: _interpolate, u: q }
+	}
 
 	//animates elements
 	function _animate(el,props,callback){
@@ -126,8 +163,9 @@ var guggenheim = function(element,opts){
         	interval,
         	target = {},
         	prop,
-        	time = (new Date).getTime(),
-        	pos
+        	time,
+        	pos,
+        	curValue
 
         if(prefix != ""){
        		for(key in props)
@@ -135,7 +173,7 @@ var guggenheim = function(element,opts){
     
      		el.style.setProperty(prefix + 'transition-property',transitions.join(', '),'')
      		el.style.setProperty(prefix + 'transition-duration',options.duration + 's','')
-     		el.style.setProperty(prefix + 'transition-timing-function',options.easing,'');
+     		el.style.setProperty(prefix + 'transition-timing-function',options.easing,'')
    			
    			if(options.duration>0)
    				_addEvent(el,_normalizeEvent('TransitionEnd'),callback)
@@ -146,11 +184,18 @@ var guggenheim = function(element,opts){
         } else {
         	
         	for (prop in props) target[prop] = _parseProps(props[prop])
-        	for (prop in props) current[prop] = _parseProps(comp[prop])
+        	for (prop in props) current[prop] = _parseProps(prop === 'opacity' ? getOpacityFromComputed(comp) : comp[prop])
+
         	interval = setInterval(function(){
+        		time = (new Date).getTime()
       	    	pos = time > finish ? 1 : (time-start)/duration
-	        	for(prop in target)
-        			el.style[prop] = target[prop].f(current[prop].v,target[prop].v,easing[options.easing](pos)) + target[prop].u
+	        	for(prop in target){
+	        		curValue = target[prop].f(current[prop].v,target[prop].v,easing[options.easing](pos)) + target[prop].u
+	        		if (prop === 'opacity') 
+	        			setOpacity(el, curValue)
+	        		else
+	        			el.style[prop] = curValue
+	        	}
        
        			if(time>finish){
         			clearInterval(interval)
@@ -158,6 +203,7 @@ var guggenheim = function(element,opts){
 	       				callback.call()
     	    	}
         	},10);
+
         }
     }
 
@@ -230,7 +276,7 @@ var guggenheim = function(element,opts){
 					props = {
 						"top":top + "px",
 						"left": left + "px",
-						"opacity":1
+						"opacity":"1"
 					}
 
 					col++
@@ -245,7 +291,9 @@ var guggenheim = function(element,opts){
 					}
 
 				} else {
-					props = {"opacity":0}
+					props = {
+						"opacity":"0"
+					}
 				}
 
 				_animate(orderedElements[i],props)
@@ -282,7 +330,7 @@ var guggenheim = function(element,opts){
 					props = {
 						"top":top + "px",
 						"left": left + "px",
-						"opacity":1
+						"opacity":"1"
 					}
 
 					_animate(el,props)
@@ -340,6 +388,13 @@ var guggenheim = function(element,opts){
 			elements[i].style.position = 'absolute'
 			elements[i].style.width = width + 'px'
 			elements[i].style.height = height + 'px'
+			elements[i].style.left = 0 + 'px'
+			elements[i].style.top = 0 + 'px'
+			if(supportsOpacity)
+				elements[i].style.opacity = 1
+			else
+				elements[i].style.filter = 'alpha(opacity=100)'
+
 		}
 	}
 	
@@ -439,4 +494,39 @@ if(!Array.isArray) {
   Array.isArray = function (arg) {  
     return Object.prototype.toString.call(arg) == '[object Array]';  
   };  
+}
+
+if (!Array.prototype.indexOf) {  
+    Array.prototype.indexOf = function (el /*, from */ ) {  
+		"use strict";  
+        if (this == null)
+            throw new TypeError();  
+
+        var t = Object(this),
+            len = t.length >>> 0,
+            n,
+            k;
+
+        if (len === 0)
+            return -1;  
+           
+        n = 0;  
+        if (arguments.length > 0) {  
+            n = Number(arguments[1]);  
+            if (n != n) // shortcut for verifying if it's NaN  
+                n = 0;  
+            else if (n != 0 && n != Infinity && n != -Infinity)
+                n = (n > 0 || -1) * Math.floor(Math.abs(n));  
+        }  
+
+        if (n >= len)
+            return -1;  
+           
+        k = n >= 0 ? n : Math.max(len - Math.abs(n), 0);  
+        for (; k < len; k++) {  
+            if (k in t && t[k] === el)
+                return k;  
+        }
+        return -1;  
+    }  
 } 
