@@ -191,7 +191,7 @@
 
       testCurrentPage: function(t){
         var gallery = guggenheim('#guggenheim-container')
-        console.log(gallery.currentPage())
+        
         t.assertEqual(gallery.currentPage(),1,'Not returning correct current page')
         gallery.jumpTo(2)
         t.assertEqual(gallery.currentPage(),2,'Not returning correct current page after jump')
