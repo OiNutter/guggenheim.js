@@ -95,14 +95,15 @@ gallery.reset();
 
 The `reset` function resets the gallery to it's initial, unfiltered, unordered state.
 
-### Next and Prev ###
+### Pagination ###
 
 ``` Javascript
 gallery.next();
 gallery.prev();
+gallery.jumpTo(page);
 ```
 
-The `next` and `prev` buttons are used for paginating through the gallery.
+The `next`, `prev` and `jumpTo` buttons are used for paginating through the gallery. There are also `currentPage` and `numPages` functions to help integrate with your chosen pagination script.
 
 
 CSS

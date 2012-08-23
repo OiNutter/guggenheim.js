@@ -47,10 +47,13 @@
 		<a onclick='filterEls("red")'>Red</a>
 		<a onclick='filterEls("green")'>Green</a> |
 		<a onclick='gallery.prev()'>Prev</a>
+		<a onclick="gallery.jumpTo(1)">1</a>
+		<a onclick="gallery.jumpTo(2)">2</a>
+		<a onclick="gallery.jumpTo(3)">3</a>
 		<a onclick='gallery.next()'>Next</a>
 		<script type="text/javascript" src="../src/guggenheim.js"></script>
 		<script type="text/javascript">
-			var gallery = guggenheim('#guggenheim-container',{rows:3,cols:3})
+			var gallery = guggenheim('#guggenheim-container',{rows:2,cols:3})
 			console.log(gallery)
 
 			function reorder(){

@@ -187,6 +187,21 @@
             ids.push('#' + els[i].getAttribute('id'))
       
         t.assertArraysEqual(order,ids,'Elements not in correct order')
+      },
+
+      testCurrentPage: function(t){
+        var gallery = guggenheim('#guggenheim-container')
+        console.log(gallery.currentPage())
+        t.assertEqual(gallery.currentPage(),1,'Not returning correct current page')
+        gallery.jumpTo(2)
+        t.assertEqual(gallery.currentPage(),2,'Not returning correct current page after jump')
+
+      },
+
+      testNumPages: function(t){
+        var gallery = guggenheim('#guggenheim-container')
+
+        t.assertEqual(gallery.numPages(),2,'Not returning the correct number of pages')
       }
 
     })

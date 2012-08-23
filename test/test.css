@@ -34,3 +34,17 @@ a:link, a:visited { color: darkblue; }
   h1, #results { text-align: center; }
   #nav { font-size: 14px; max-width: auto; }
 }
+
+#guggenheim-container{
+  width:800px;
+  height:300px;
+  overflow:hidden;
+  position:relative;
+}
+
+.guggenheim-item{
+  width:100px;
+  height:100px;
+  background:#900;
+  margin:10px;
+}

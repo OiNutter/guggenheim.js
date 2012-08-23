@@ -215,7 +215,7 @@ var guggenheim = function(element,opts){
 
 	    	var containerDimensions = _getElementDimensions(container),
     			elDimensions = _getElementDimensions(elements[0]),
-    			pages = Math.ceil(filteredElements.length/(options.rows*options.cols)),
+    			pages = numPages(),
     			sliderWidth = pages * containerDimensions.width
 
     		if(parseFloat(slider.style.left) != containerDimensions.padding.left)
@@ -232,7 +232,7 @@ var guggenheim = function(element,opts){
 
        		var containerDimensions = _getElementDimensions(container),
     			elDimensions = _getElementDimensions(elements[0]),
-    			pages = Math.ceil(filteredElements.length/(options.rows*options.cols)),
+    			pages = numPages(),
     			sliderWidth = pages * containerDimensions.width
     	
     		if(parseFloat(slider.style.left) > -(sliderWidth - containerDimensions.width - containerDimensions.padding.left - containerDimensions.padding.right))
@@ -241,6 +241,37 @@ var guggenheim = function(element,opts){
 	    		animating = false
     		
     	},
+
+    jumpTo = function(page){
+    		if(animating)
+    			return false
+
+    		animating = true
+
+    		var containerDimensions = _getElementDimensions(container),
+    			elDimensions = _getElementDimensions(elements[0]),
+    			pages = numPages(),
+    			sliderWidth = pages * containerDimensions.width,
+    			thisPage = currentPage(),
+    			offset = -((page-1) * (containerDimensions.width-containerDimensions.padding.left)) + 'px'
+    		
+    		if(thisPage != page && page <= pages && page > 0)
+    			_animate(slider,{"left":offset},function(){ animating=false})
+    		else
+    			animating = false
+    	
+    },
+
+    currentPage = function(){
+    	var containerDimensions = _getElementDimensions(container),
+    		page = Math.ceil(-parseFloat(slider.style.left)/containerDimensions.width) + 1
+
+		return typeof page == "number" ? page : 1
+    },
+
+    numPages = function(){
+    	return Math.ceil(filteredElements.length/(options.rows*options.cols))
+    },
 
     // runs through list of results and hides any elements that aren't in the list of results
 	filter = function(filterFunction){
@@ -485,7 +516,10 @@ var guggenheim = function(element,opts){
 			"order":order,
 			"filter":filter,
 			"prev":prev,
-			"next":next
+			"next":next,
+			"jumpTo":jumpTo,
+			"currentPage":currentPage,
+			"numPages":numPages
 		}
 
 }
