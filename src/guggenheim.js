@@ -216,12 +216,17 @@ var guggenheim = function(element,opts){
 	    	var containerDimensions = _getElementDimensions(container),
     			elDimensions = _getElementDimensions(elements[0]),
     			pages = numPages(),
-    			sliderWidth = pages * containerDimensions.width
+    			sliderWidth = pages * containerDimensions.width,
+    			numPerPage = options.cols * options.rows,
+    			thisPage = currentPage(),
+    			newEls = filteredElements.slice((thisPage-2)*numPerPage,((thisPage-2)*numPerPage) + numPerPage)
 
-    		if(parseFloat(slider.style.left) != containerDimensions.padding.left)
-	    		_animate(slider,{"left":(parseFloat(slider.offsetLeft) + containerDimensions.width - containerDimensions.padding.left) + 'px'},function(){animating=false})
-    		else
+    		if(newEls.length){
+    			options.beforeSlide(newEls)
+	    		_animate(slider,{"left":(parseFloat(slider.offsetLeft) + containerDimensions.width - containerDimensions.padding.left) + 'px'},function(){options.afterSlide(newEls); animating=false})
+    		} else {
 	    		animating = false
+	    	}
 
     	},
 	next = function(){
@@ -233,12 +238,17 @@ var guggenheim = function(element,opts){
        		var containerDimensions = _getElementDimensions(container),
     			elDimensions = _getElementDimensions(elements[0]),
     			pages = numPages(),
-    			sliderWidth = pages * containerDimensions.width
+    			sliderWidth = pages * containerDimensions.width,
+    			numPerPage = options.cols * options.rows,
+    			thisPage = currentPage(),
+    			newEls = filteredElements.slice(thisPage*numPerPage,(thisPage*numPerPage) + numPerPage)
     	
-    		if(parseFloat(slider.style.left) > -(sliderWidth - containerDimensions.width - containerDimensions.padding.left - containerDimensions.padding.right))
-	    		_animate(slider,{"left":(parseFloat(slider.offsetLeft) - containerDimensions.width-containerDimensions.padding.left) + 'px'},function(){ animating=false})
-    		else
+    		if(newEls.length){
+    			options.beforeSlide(newEls)
+	    		_animate(slider,{"left":(parseFloat(slider.offsetLeft) - containerDimensions.width-containerDimensions.padding.left) + 'px'},function(){options.afterSlide(newEls); animating=false})
+    		} else {
 	    		animating = false
+	    	}
     		
     	},
 
@@ -253,13 +263,16 @@ var guggenheim = function(element,opts){
     			pages = numPages(),
     			sliderWidth = pages * containerDimensions.width,
     			thisPage = currentPage(),
-    			offset = -((page-1) * (containerDimensions.width-containerDimensions.padding.left)) + 'px'
+    			offset = -((page-1) * (containerDimensions.width-containerDimensions.padding.left)) + 'px',
+    			numPerPage = options.cols * options.rows,
+    			newEls = filteredElements.slice((page-1)*numPerPage,((page-1)*numPerPage) + numPerPage)
     		
-    		if(thisPage != page && page <= pages && page > 0)
-    			_animate(slider,{"left":offset},function(){ animating=false})
-    		else
+    		if(thisPage != page && page <= pages && page > 0){
+    			options.beforeSlide(newEls)
+    			_animate(slider,{"left":offset},function(){ options.afterSlide(newEls); animating=false})
+    		} else {
     			animating = false
-    	
+    		}
     },
 
     currentPage = function(){
@@ -444,6 +457,8 @@ var guggenheim = function(element,opts){
 		'slider':'div.guggenheim-slider',
 		'width':null,
 		'height':null,
+		'beforeSlide':function(){},
+		'afterSlide':function(){}
 	},opts)
 
 	//set up container
