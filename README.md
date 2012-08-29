@@ -55,10 +55,10 @@ Where element is either the css selector of the container, or the actual DOM ele
 * slider - `div.guggenheim-slider` - CSS selector for the internal wrapper element used for the gallery pagination.
 * width - `null` - Integer width for the container in pixels. If null will expect there to be a width set in the css.
 * height - `null` - Integer height for the container in pixels. If null will expect there to be a height set in the css.
-* beforeSlide - `function(newEls){}` - Callback used in pagination functions. Fired before the new page slides. Is passed an array of the elements that will become visible.
-* afterSlide - `function(newEls){}` - Callback used in pagination functions. Fired after the new page slides. Is passed an array of the elements that are now visible.
+* before - `function(newEls){}` - Callback fired before update of elements. Is passed an array of the elements that will become visible.
+* after - `function(newEls){}` - Callback fired after update of elements. Is passed an array of the elements that are now visible.
 
-Once you have your gallery initialised you can manipulate it by calling one of the methods detailed below on it.
+Once you have your gallery initialised you can manipulate it by calling one of the methods detailed below on it. Callbacks are currently only called on the following functions `reset`,`next`,`prev` and `jumpTo`
 
 Methods
 -------

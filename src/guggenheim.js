@@ -222,8 +222,8 @@ var guggenheim = function(element,opts){
     			newEls = filteredElements.slice((thisPage-2)*numPerPage,((thisPage-2)*numPerPage) + numPerPage)
 
     		if(newEls.length){
-    			options.beforeSlide(newEls)
-	    		_animate(slider,{"left":(parseFloat(slider.offsetLeft) + containerDimensions.width - containerDimensions.padding.left) + 'px'},function(){options.afterSlide(newEls); animating=false})
+    			options.before(newEls)
+	    		_animate(slider,{"left":(parseFloat(slider.offsetLeft) + containerDimensions.width - containerDimensions.padding.left) + 'px'},function(){options.after(newEls); animating=false})
     		} else {
 	    		animating = false
 	    	}
@@ -244,8 +244,8 @@ var guggenheim = function(element,opts){
     			newEls = filteredElements.slice(thisPage*numPerPage,(thisPage*numPerPage) + numPerPage)
     	
     		if(newEls.length){
-    			options.beforeSlide(newEls)
-	    		_animate(slider,{"left":(parseFloat(slider.offsetLeft) - containerDimensions.width-containerDimensions.padding.left) + 'px'},function(){options.afterSlide(newEls); animating=false})
+    			options.before(newEls)
+	    		_animate(slider,{"left":(parseFloat(slider.offsetLeft) - containerDimensions.width-containerDimensions.padding.left) + 'px'},function(){options.after(newEls); animating=false})
     		} else {
 	    		animating = false
 	    	}
@@ -268,8 +268,8 @@ var guggenheim = function(element,opts){
     			newEls = filteredElements.slice((page-1)*numPerPage,((page-1)*numPerPage) + numPerPage)
     		
     		if(thisPage != page && page <= pages && page > 0){
-    			options.beforeSlide(newEls)
-    			_animate(slider,{"left":offset},function(){ options.afterSlide(newEls); animating=false})
+    			options.before(newEls)
+    			_animate(slider,{"left":offset},function(){ options.after(newEls); animating=false})
     		} else {
     			animating = false
     		}
@@ -314,8 +314,8 @@ var guggenheim = function(element,opts){
 			for(i = 0; i<orderedElements.length; i++){
 				if(filterFunction(orderedElements[i])){
 					filteredElements.push(orderedElements[i])
-					top = ((dimensions.height + dimensions.margin.bottom) * row) + dimensions.margin.top
-					left = ((dimensions.width + dimensions.margin.right) * col) + (containerDimensions.width*page) + dimensions.margin.left
+					top = ((dimensions.height + dimensions.margin.bottom + dimensions.margin.top) * row)
+					left = ((dimensions.width + dimensions.margin.right + dimensions.margin.left) * col) + (containerDimensions.width*page)
 				
 					props = {
 						"top":top + "px",
@@ -368,8 +368,8 @@ var guggenheim = function(element,opts){
 				el = (typeof orderedResults[i] == 'string') ? container.querySelector(orderedResults[i]) : orderedResults[i]
 				orderedElements.push(el)
 				if(filteredElements.indexOf(el) != -1){
-					top = ((dimensions.height + dimensions.margin.bottom) * row) + dimensions.margin.top
-					left = ((dimensions.width + dimensions.margin.right) * col) + ((containerDimensions.width)*page) + dimensions.margin.left
+					top = ((dimensions.height + dimensions.margin.bottom + dimensions.margin.bottom) * row)
+					left = ((dimensions.width + dimensions.margin.right + dimensions.margin.left) * col) + ((containerDimensions.width)*page)
 				
 					props = {
 						"top":top + "px",
@@ -400,6 +400,7 @@ var guggenheim = function(element,opts){
 	reset = function(){
 			var initialOrder = [],
 				i
+
 			filteredElements = orderedElements = []
 
 			for(i = 0;i<elements.length;i++){
@@ -409,7 +410,9 @@ var guggenheim = function(element,opts){
 
 			orderedElements = filteredElements
 
+			options.before(filteredElements.slice(0, options.cols * options.rows))
 			order(initialOrder)
+			options.after(filteredElements.slice(0, options.cols * options.rows))
 		}
 
 	
@@ -417,16 +420,24 @@ var guggenheim = function(element,opts){
 		var i,
 			width = 0,
 			height = 0,
+			extraWidth = 0,
+			extraHeight = 0,
+			thisExtraWidth = 0,
+			thisExtraHeight = 0,
 			containerDimensions = _getElementDimensions(container)
 		
 		for(i=0;i<elements.length;i++){
 			dimensions = _getElementDimensions(elements[i])
-			if(dimensions.width > width) width = dimensions.width - dimensions.padding.left - dimensions.padding.right
-			if(dimensions.height > height) height = dimensions.height - dimensions.padding.top - dimensions.padding.bottom
+			thisExtraWidth = dimensions.padding.left + dimensions.padding.right
+			thisExtraHeight = dimensions.padding.top + dimensions.padding.bottom
+			if(dimensions.width>width) width = dimensions.width - thisExtraWidth
+			if(dimensions.height>height) height = dimensions.height - thisExtraHeight
+			if(thisExtraWidth>extraWidth) extraWidth = thisExtraWidth
+			if(thisExtraHeight>extraHeight) extraHeight = thisExtraHeight
 		}
 
-		if (width>containerDimensions.width/options.cols) width = Math.floor(containerDimensions.width/options.cols)
-		if (height>containerDimensions.height/options.rows) height = Math.floor(containerDimensions.height/options.rows)
+		if (options.cols != "auto" && width>containerDimensions.width/options.cols) width = Math.floor(containerDimensions.width/options.cols) - thisExtraWidth
+		if (options.rows != "auto" && height>containerDimensions.height/options.rows) height = Math.floor(containerDimensions.height/options.rows) - thisExtraHeight
 
 		for(i=0;i<elements.length;i++){
 			elements[i].style.position = 'absolute'
@@ -438,8 +449,8 @@ var guggenheim = function(element,opts){
 				elements[i].style.opacity = 1
 			else
 				elements[i].style.filter = 'alpha(opacity=100)'
-
 		}
+
 	}
 	
 	
@@ -457,8 +468,8 @@ var guggenheim = function(element,opts){
 		'slider':'div.guggenheim-slider',
 		'width':null,
 		'height':null,
-		'beforeSlide':function(){},
-		'afterSlide':function(){}
+		'before':function(){},
+		'after':function(){}
 	},opts)
 
 	//set up container
@@ -478,7 +489,7 @@ var guggenheim = function(element,opts){
 	if(!elements.length)
 		throw 'Gallery is empty'
 
-	setUpElements()
+	
 
 	var containerDimensions = _getElementDimensions(container), 
 		dimensions, 
@@ -502,6 +513,10 @@ var guggenheim = function(element,opts){
 		height = dimensions.height + dimensions.margin.top + dimensions.margin.bottom
 		options.rows = Math.floor(containerDimensions.height/height)
 	}
+
+	console.log(options)
+
+	setUpElements()
 
 	//set up slider
 	slider = container.querySelector(options.slider)

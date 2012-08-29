@@ -7,14 +7,18 @@
 				width:800px;
 				height:400px;
 				overflow:hidden;
+				background:#ccc;
 			}
 
 			.guggenheim-item{
-				width:100px;
+				width:90px;
 				height:100px;
 				background:#900;
-				margin:10px;
+				margin:5px;
 			}
+
+			.guggenheim-item.green{ background:#090; }
+			.guggenheim-item.blue{ background:#009; color:#fff;}
 
 		</style>
 	</head>
@@ -53,8 +57,7 @@
 		<a onclick='gallery.next()'>Next</a>
 		<script type="text/javascript" src="../src/guggenheim.js"></script>
 		<script type="text/javascript">
-			var gallery = guggenheim('#guggenheim-container',{rows:2,cols:3})
-			console.log(gallery)
+			var gallery = guggenheim('#guggenheim-container')
 
 			function reorder(){
 				var order = [
