@@ -81,7 +81,7 @@
     }
   }
 
-  var globals = [], expected = ['guggenheim', 'Evidence']
+  var globals = [], expected = ['guggenheim', 'Evidence','gallery']
   for (var key in window) globals.push(key)
 
   function checkLeakedGlobals() {

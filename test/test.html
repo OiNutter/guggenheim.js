@@ -5,6 +5,7 @@
   <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
   <link rel="stylesheet" href="test.css">
   <title>Guggenheim unit tests</title>
+  <script src="../vendor/zepto.min.js"></script>
   <script src="../vendor/evidence.min.js"></script>
   <script src="evidence_runner.js"></script>
   <script src="../src/guggenheim.js"></script>
@@ -50,7 +51,12 @@
   </div><!-- fixtures -->
 
   <script>
-  (function(){
+  
+  var gallery;
+
+  $(document).ready(function(){
+
+    gallery = guggenheim('#guggenheim-container')
 
     Evidence.Assertions.assertSucceeds = function(func,message){
       var excepted = false,
@@ -121,12 +127,8 @@
 
       testInitialises: function(t){
         // Check initialises correctly from string
-        var container = document.querySelector('#guggenheim-container'),
-            gallery = guggenheim('#guggenheim-container')
-
         t.assertSucceeds(function(){guggenheim('#guggenheim-container')},'Failed to initialise when passed a string')
-        t.assertSucceeds(function(){guggenheim(document.querySelector('#guggenheim-container'))},'Failed to initialise when passed a DOM element')
-       
+        t.assertSucceeds(function(){guggenheim(document.querySelector('#guggenheim-container'))},'Failed to initialise when passed a DOM element') 
       },
 
       testExceptsWhenGivenBadElement: function(t){
@@ -138,8 +140,7 @@
       },
 
       testFiltering: function(t){
-        var gallery = guggenheim('#guggenheim-container'),
-            els
+        var els
 
         // Filter to red items
         gallery.filter('red')
@@ -156,11 +157,11 @@
         els = getVisibleElements()
         t.assertEqual(3,els.length,'Filtered to incorrect number of red and multi elements')      
 
+        gallery.reset()
       },
 
       testOrdering: function(t){
-        var gallery = guggenheim('#guggenheim-container'),
-            order = [
+        var order = [
                 '#item-4',
                 '#item-11',
                 '#item-9',
@@ -187,26 +188,27 @@
             ids.push('#' + els[i].getAttribute('id'))
       
         t.assertArraysEqual(order,ids,'Elements not in correct order')
+
+        gallery.reset()
       },
 
       testCurrentPage: function(t){
-        var gallery = guggenheim('#guggenheim-container')
-        
+             
         t.assertEqual(gallery.currentPage(),1,'Not returning correct current page')
         gallery.jumpTo(2)
         t.assertEqual(gallery.currentPage(),2,'Not returning correct current page after jump')
 
+        gallery.reset()
+
       },
 
       testNumPages: function(t){
-        var gallery = guggenheim('#guggenheim-container')
-
         t.assertEqual(gallery.numPages(),2,'Not returning the correct number of pages')
       }
 
     })
 
-  })()
+  })
   </script>
 </body>
 </html>
