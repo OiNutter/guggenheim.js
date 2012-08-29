@@ -31,7 +31,9 @@ var guggenheim = function(element,opts){
     	supportsFilters = typeof testEl.style.filter == 'string',
     	reOpacity = /alpha\(opacity=([^\)]+)\)/, 
     	setOpacity = function(){ }, 
-    	getOpacityFromComputed = function(){ return '1' }
+    	getOpacityFromComputed = function(){ return '1' },
+    	handlers = {},
+    	zid=1
 
     function _downcase(str) { return str.toLowerCase() }
   	function _normalizeEvent(name) { return eventPrefix ? eventPrefix + name : _downcase(name) }
@@ -96,18 +98,45 @@ var guggenheim = function(element,opts){
 		}
 	}
 
+	function _zid(el) {
+    	return el._zid || (el._zid = zid++)
+  	}
+
 	function _addEvent(el,event,callback){
+		
+		var id = _zid(el)
+
+		if(!handlers[id])
+			handlers[id] = {}
+
+		if(!handlers[id][event])
+			handlers[id][event] = []
+
+		handlers[id][event].push(callback)
+
 		if(el.addEventListener)
 			el.addEventListener(event,callback,false)
 		else
 			el.attachEvent(event,callback)
 	}
 
-	function _removeEvent(el,event,callback){
+	function _detachEvent(el,event,callback){
 		if(el.removeEventListener)
 			el.removeEventListener(event,callback,false)
 		else
 			el.detachEvent(event,callback)
+	}
+	
+	function _removeEvent(el,event,callback){
+		var id = _zid(el)
+		if(handlers[id] && handlers[id][event]){
+			for(var i=0;i<handlers[id][event].length;i++){
+				if(callback==null || callback==handlers[id][event][i]){
+					handlers[id][event].splice(i,1)
+					_detachEvent(el,event,handlers[id][event][i])
+				}
+			}
+		}
 	}
 
 	if (supportsOpacity) {
@@ -175,6 +204,8 @@ var guggenheim = function(element,opts){
      		el.style.setProperty(prefix + 'transition-duration',options.duration + 's','')
      		el.style.setProperty(prefix + 'transition-timing-function',options.easing,'')
    			
+   			_removeEvent(el,_normalizeEvent('TransitionEnd'))
+
    			if(options.duration>0)
    				_addEvent(el,_normalizeEvent('TransitionEnd'),callback)
 
@@ -219,11 +250,12 @@ var guggenheim = function(element,opts){
     			sliderWidth = pages * containerDimensions.width,
     			numPerPage = options.cols * options.rows,
     			thisPage = currentPage(),
-    			newEls = filteredElements.slice((thisPage-2)*numPerPage,((thisPage-2)*numPerPage) + numPerPage)
+    			newEls = filteredElements.slice((thisPage-2)*numPerPage,((thisPage-2)*numPerPage) + numPerPage),
+    			callback = function(){options.after(newEls); animating=false}
 
     		if(newEls.length){
     			options.before(newEls)
-	    		_animate(slider,{"left":(parseFloat(slider.offsetLeft) + containerDimensions.width - containerDimensions.padding.left) + 'px'},function(){options.after(newEls); animating=false})
+	    		_animate(slider,{"left":(parseFloat(slider.offsetLeft) + containerDimensions.width - containerDimensions.padding.left) + 'px'},callback)
     		} else {
 	    		animating = false
 	    	}
@@ -241,11 +273,12 @@ var guggenheim = function(element,opts){
     			sliderWidth = pages * containerDimensions.width,
     			numPerPage = options.cols * options.rows,
     			thisPage = currentPage(),
-    			newEls = filteredElements.slice(thisPage*numPerPage,(thisPage*numPerPage) + numPerPage)
+    			newEls = filteredElements.slice(thisPage*numPerPage,(thisPage*numPerPage) + numPerPage),
+    			callback = function(){options.after(newEls); animating=false}
     	
     		if(newEls.length){
     			options.before(newEls)
-	    		_animate(slider,{"left":(parseFloat(slider.offsetLeft) - containerDimensions.width-containerDimensions.padding.left) + 'px'},function(){options.after(newEls); animating=false})
+	    		_animate(slider,{"left":(parseFloat(slider.offsetLeft) - containerDimensions.width-containerDimensions.padding.left) + 'px'},callback)
     		} else {
 	    		animating = false
 	    	}
@@ -265,11 +298,12 @@ var guggenheim = function(element,opts){
     			thisPage = currentPage(),
     			offset = -((page-1) * (containerDimensions.width-containerDimensions.padding.left)) + 'px',
     			numPerPage = options.cols * options.rows,
-    			newEls = filteredElements.slice((page-1)*numPerPage,((page-1)*numPerPage) + numPerPage)
+    			newEls = filteredElements.slice((page-1)*numPerPage,((page-1)*numPerPage) + numPerPage),
+    			callback = function(){options.after(newEls); animating=false}
     		
     		if(thisPage != page && page <= pages && page > 0){
     			options.before(newEls)
-    			_animate(slider,{"left":offset},function(){ options.after(newEls); animating=false})
+    			_animate(slider,{"left":offset},callback)
     		} else {
     			animating = false
     		}
