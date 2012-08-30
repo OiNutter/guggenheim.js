@@ -11,7 +11,7 @@
 			}
 
 			.guggenheim-item{
-				width:90px;
+				width:790px;
 				height:100px;
 				background:#900;
 				margin:5px;
@@ -57,7 +57,7 @@
 		<a onclick='gallery.next()'>Next</a>
 		<script type="text/javascript" src="../src/guggenheim.js"></script>
 		<script type="text/javascript">
-			var gallery = guggenheim('#guggenheim-container',{rows:3,cols:3,before:function(els){console.log(els)},after:function(els){console.log(els)}})
+			var gallery = guggenheim('#guggenheim-container',{rows:3,cols:1,after:function(els){console.log(els)}})
 
 			function reorder(){
 				var order = [

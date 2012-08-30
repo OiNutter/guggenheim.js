@@ -33,7 +33,10 @@ var guggenheim = function(element,opts){
     	setOpacity = function(){ }, 
     	getOpacityFromComputed = function(){ return '1' },
     	handlers = {},
-    	zid=1
+    	zid=1,
+    	completedAnimations,
+    	expectedAnimations,
+    	curFilter = function(){return true}
 
     function _downcase(str) { return str.toLowerCase() }
   	function _normalizeEvent(name) { return eventPrefix ? eventPrefix + name : _downcase(name) }
@@ -98,6 +101,15 @@ var guggenheim = function(element,opts){
 		}
 	}
 
+	function _getElementPosition(el){
+		var style = (window.getComputedStyle) ? window.getComputedStyle(el,null) : el.currentStyle
+
+		return {
+			"top":parseFloat(style.top),
+			"left":parseFloat(style.left)
+		}
+	}
+
 	function _zid(el) {
     	return el._zid || (el._zid = zid++)
   	}
@@ -126,7 +138,7 @@ var guggenheim = function(element,opts){
 		else
 			el.detachEvent(event,callback)
 	}
-	
+
 	function _removeEvent(el,event,callback){
 		var id = _zid(el)
 		if(handlers[id] && handlers[id][event]){
@@ -248,13 +260,10 @@ var guggenheim = function(element,opts){
     			elDimensions = _getElementDimensions(elements[0]),
     			pages = numPages(),
     			sliderWidth = pages * containerDimensions.width,
-    			numPerPage = options.cols * options.rows,
-    			thisPage = currentPage(),
-    			newEls = filteredElements.slice((thisPage-2)*numPerPage,((thisPage-2)*numPerPage) + numPerPage),
-    			callback = function(){options.after(newEls); animating=false}
+    			callback = function(){options.after(filteredElements); animating=false}
 
-    		if(newEls.length){
-    			options.before(newEls)
+    		if(parseFloat(slider.style.left) != containerDimensions.padding.left){
+    			options.before(filteredElements)
 	    		_animate(slider,{"left":(parseFloat(slider.offsetLeft) + containerDimensions.width - containerDimensions.padding.left) + 'px'},callback)
     		} else {
 	    		animating = false
@@ -271,13 +280,10 @@ var guggenheim = function(element,opts){
     			elDimensions = _getElementDimensions(elements[0]),
     			pages = numPages(),
     			sliderWidth = pages * containerDimensions.width,
-    			numPerPage = options.cols * options.rows,
-    			thisPage = currentPage(),
-    			newEls = filteredElements.slice(thisPage*numPerPage,(thisPage*numPerPage) + numPerPage),
-    			callback = function(){options.after(newEls); animating=false}
+    			callback = function(){options.after(filteredElements); animating=false}
     	
-    		if(newEls.length){
-    			options.before(newEls)
+    		if(parseFloat(slider.style.left) > -(sliderWidth - containerDimensions.width - containerDimensions.padding.left - containerDimensions.padding.right)){
+    			options.before(filteredElements)
 	    		_animate(slider,{"left":(parseFloat(slider.offsetLeft) - containerDimensions.width-containerDimensions.padding.left) + 'px'},callback)
     		} else {
 	    		animating = false
@@ -297,12 +303,10 @@ var guggenheim = function(element,opts){
     			sliderWidth = pages * containerDimensions.width,
     			thisPage = currentPage(),
     			offset = -((page-1) * (containerDimensions.width-containerDimensions.padding.left)) + 'px',
-    			numPerPage = options.cols * options.rows,
-    			newEls = filteredElements.slice((page-1)*numPerPage,((page-1)*numPerPage) + numPerPage),
-    			callback = function(){options.after(newEls); animating=false}
+    			callback = function(){options.after(filteredElements); animating=false}
     		
     		if(thisPage != page && page <= pages && page > 0){
-    			options.before(newEls)
+    			options.before(filteredElements)
     			_animate(slider,{"left":offset},callback)
     		} else {
     			animating = false
@@ -320,6 +324,16 @@ var guggenheim = function(element,opts){
     	return Math.ceil(filteredElements.length/(options.rows*options.cols))
     },
 
+    isVisible = function(el){
+    	var index = filteredElements.indexOf(el),
+    		curPage = currentPage()
+    		numPerPage = options.rows * options.cols
+    		start = (currentPage()-1) * numPerPage
+    		end = (start+numPerPage<=filteredElements.length) ? start+numPerPage : filteredElements.length
+
+    	return index != -1 && index >= start && index < end
+    },
+
     // runs through list of results and hides any elements that aren't in the list of results
 	filter = function(filterFunction){
 			var row = 0,
@@ -331,7 +345,10 @@ var guggenheim = function(element,opts){
 				page = 0,
 				i,
 				props = {},
-				classString
+				classString,
+				callback = function(e){ completedAnimations++; if(completedAnimations==expectedAnimations){options.after(filteredElements)} },
+				curPosition,
+				el
 
 			if(typeof filterFunction == 'string' || Array.isArray(filterFunction) ){
 				if(typeof filterFunction == 'string')
@@ -341,16 +358,28 @@ var guggenheim = function(element,opts){
 				filterFunction = function(el){ return (new RegExp(classString)).test(el.className)}
 			}
 
+			curFilter = filterFunction
+
 			filteredElements = []
 
 			_animate(slider,{"left":containerDimensions.padding.left + 'px'})
 
+			completedAnimations = expectedAnimations = 0
+
 			for(i = 0; i<orderedElements.length; i++){
-				if(filterFunction(orderedElements[i])){
-					filteredElements.push(orderedElements[i])
+				el = orderedElements[i]
+				if(filterFunction(el)){
+					curPosition = _getElementPosition(el)
+					filteredElements.push(el)
 					top = ((dimensions.height + dimensions.margin.bottom + dimensions.margin.top) * row)
 					left = ((dimensions.width + dimensions.margin.right + dimensions.margin.left) * col) + (containerDimensions.width*page)
-				
+
+					if(curPosition.top != top)
+						expectedAnimations++
+
+					if(curPosition.left != left)
+						expectedAnimations++
+
 					props = {
 						"top":top + "px",
 						"left": left + "px",
@@ -374,7 +403,11 @@ var guggenheim = function(element,opts){
 					}
 				}
 
-				_animate(orderedElements[i],props)
+				if(getOpacityFromComputed(el.currentStyle ? el.currentStyle : getComputedStyle(el, null)) != props['opacity'])
+					expectedAnimations++
+				
+				options.before([el])
+				_animate(orderedElements[i],props,callback)
 
 			}
 
@@ -394,24 +427,41 @@ var guggenheim = function(element,opts){
 				page = 0,
 				i,
 				props = {},
-				el
+				el,
+				callback = function(e){ completedAnimations++; if(completedAnimations==expectedAnimations){options.after(filteredElements)} },
+				newFiltered = [],
+				curPosition
 
 			orderedElements = []
+
+			completedAnimations = expectedAnimations = 0
 
 			for(i = 0; i<orderedResults.length; i++){
 				el = (typeof orderedResults[i] == 'string') ? container.querySelector(orderedResults[i]) : orderedResults[i]
 				orderedElements.push(el)
 				if(filteredElements.indexOf(el) != -1){
+					curPosition = _getElementPosition(el)
+					newFiltered.push(el)
 					top = ((dimensions.height + dimensions.margin.bottom + dimensions.margin.bottom) * row)
-					left = ((dimensions.width + dimensions.margin.right + dimensions.margin.left) * col) + ((containerDimensions.width)*page)
-				
+					left = ((dimensions.width + dimensions.margin.right + dimensions.margin.left) * col) + ((containerDimensions.width)*page),
 					props = {
 						"top":top + "px",
 						"left": left + "px",
 						"opacity":"1"
 					}
 
-					_animate(el,props)
+					if(curPosition.top != top)
+						expectedAnimations++
+
+					if(curPosition.left != left)
+						expectedAnimations++
+
+					if(getOpacityFromComputed(el.currentStyle ? el.currentStyle : getComputedStyle(el, null)) != 1)
+						expectedAnimations++
+
+					options.before([el])
+
+					_animate(el,props,callback)
 
 					col++
 
@@ -427,6 +477,9 @@ var guggenheim = function(element,opts){
 
 			}
 
+			//set filtered elements to new order
+			filteredElements = newFiltered
+
 			return orderedElements
 
 		},
@@ -437,16 +490,44 @@ var guggenheim = function(element,opts){
 
 			filteredElements = orderedElements = []
 
-			for(i = 0;i<elements.length;i++){
+			for(i = 0;i<elements.length;i++)
 				filteredElements.push(elements[i])
-				initialOrder.push(elements[i])
-			}
 
 			orderedElements = filteredElements
 
-			options.before(filteredElements.slice(0, options.cols * options.rows))
-			order(initialOrder)
-			options.after(filteredElements.slice(0, options.cols * options.rows))
+			order(orderedElements)
+		},
+
+	add = function(el,position){
+			var dimensions = _getElementDimensions(elements[0]),
+				matchesFilter = curFilter(el)
+
+			//set up styles
+			el.style.position = "absolute"
+			el.style.width = (dimensions.width - dimensions.padding.left - dimensions.padding.right) + "px"
+			el.style.height = (dimensions.height - dimensions.padding.top - dimensions.padding.bottom) + "px"
+			if(supportsOpacity)
+				el.style.opacity = matchesFilter ? 1 : 0
+			else
+				el.style.filter = 'alpha(opacity=' + (matchesFilter ? 100 : 0) + ')'
+
+			slider.appendChild(el)
+
+			if(matchesFilter)
+				filteredElements.splice(position-1,0,el)
+
+			orderedElements.splice(position-1,0,el)
+			elements = container.querySelectorAll(options.selector)
+
+			order(orderedElements)
+		},
+
+	remove = function(el){
+			orderedElements.splice(orderedElements.indexOf(el),1)
+			filteredElements.splice(filteredElements.indexOf(el),1)
+			slider.removeChild(el)
+			elements = container.querySelectorAll(options.selector)
+			order(orderedElements)
 		}
 
 	
@@ -548,8 +629,6 @@ var guggenheim = function(element,opts){
 		options.rows = Math.floor(containerDimensions.height/height)
 	}
 
-	console.log(options)
-
 	setUpElements()
 
 	//set up slider
@@ -583,7 +662,10 @@ var guggenheim = function(element,opts){
 			"next":next,
 			"jumpTo":jumpTo,
 			"currentPage":currentPage,
-			"numPages":numPages
+			"numPages":numPages,
+			"remove":remove,
+			"add":add,
+			"isVisible":isVisible
 		}
 
 }
