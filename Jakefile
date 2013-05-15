@@ -11,18 +11,13 @@ namespace('guggenheim', function(){
 	desc('Default build task. Minifies library and creates dist folder.')
 	task('build',[],function(){
 
-		if(!path.existsSync('dist'))
+		if(!fs.existsSync('dist'))
 			fs.mkdir('dist')
 
-		var orig_code = fs.readFileSync('src/guggenheim.js').toString(),
-			ast = uglifyjs.parser.parse(orig_code), // parse code and get the initial AST
-			final_code = "",
+		var ast = uglifyjs.minify('src/guggenheim.js'), // parse code and get the initial AST
 			output = fs.openSync('dist/guggenheim.min.js','w+')
-	
-		ast = uglifyjs.uglify.ast_mangle(ast); // get a new AST with mangled names
-		ast = uglifyjs.uglify.ast_squeeze(ast) // get an AST with compression optimizations
 
-		fs.writeSync(output,uglifyjs.uglify.gen_code(ast))
+		fs.writeSync(output,ast.code)
 	})
 
 	desc('Runs PhantomJS tests')
