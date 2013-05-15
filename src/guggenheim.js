@@ -1,5 +1,5 @@
 /*
- * Guggenheim.js 0.1
+ * Guggenheim.js 0.2
  * (c) 2012 Will McKenzie
  * Provided under the MIT License
  * See http://github.com/OiNutter/guggenheim.js for more details
@@ -254,12 +254,11 @@ var guggenheim = function(element,opts){
     			thisPage = currentPage(),
     			newEls = filteredElements.slice((thisPage-2)*numPerPage,((thisPage-2)*numPerPage) + numPerPage)
 
-    		if(newEls.length){
+    		if(newEls.length)
 	    		_animate(slider,{"left":(parseFloat(slider.offsetLeft) + containerDimensions.width - containerDimensions.padding.left) + 'px'},paginationCallback)
-    		} else {
+    		else
 	    		animating = false
-	    	}
-
+	    	
 	    	return newEls
 
     	},
@@ -286,9 +285,13 @@ var guggenheim = function(element,opts){
     		
     	},
 
-    jumpTo = function(page){
+    jumpTo = function(page,animate){
+
     		if(animating)
     			return false
+
+    		if(animate==null)
+    			animate=true
 
     		animating = true
 
@@ -301,10 +304,15 @@ var guggenheim = function(element,opts){
     			numPerPage = options.cols * options.rows,
     			newEls = filteredElements.slice((page-1)*numPerPage,((page-1)*numPerPage) + numPerPage)
 
-    		if(thisPage != page && page <= pages && page > 0)
-    			_animate(slider,{"left":offset},paginationCallback)
-    		else
+    		if(thisPage != page && page <= pages && page > 0){
+    			if(animate)
+    				_animate(slider,{"left":offset},paginationCallback)
+    			else
+    				slider.style.left = offset
+    				animating=false
+    		} else {
     			animating = false
+    		}
     		
     		return newEls
     },
