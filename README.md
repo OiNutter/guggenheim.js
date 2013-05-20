@@ -55,10 +55,8 @@ Where element is either the css selector of the container, or the actual DOM ele
 * slider - `div.guggenheim-slider` - CSS selector for the internal wrapper element used for the gallery pagination.
 * width - `null` - Integer width for the container in pixels. If null will expect there to be a width set in the css.
 * height - `null` - Integer height for the container in pixels. If null will expect there to be a height set in the css.
-* before - `function(newEls){}` - Callback fired before update of elements. Is passed an array of the elements that will become visible.
-* after - `function(newEls){}` - Callback fired after update of elements. Is passed an array of the elements that are now visible.
 
-Once you have your gallery initialised you can manipulate it by calling one of the methods detailed below on it. Callbacks are currently only called on the following functions `reset`,`next`,`prev` and `jumpTo`
+Once you have your gallery initialised you can manipulate it by calling one of the methods detailed below on it.
 
 Methods
 -------
@@ -119,6 +117,11 @@ Examples
 
 Check out the [demo page](http://oinutter.github.com/guggenheim.js)
 
+Plugins
+-------
+
+* [Paginate.js](https://github.com/OiNutter/paginate.js) - A pagination plugin for guggenheim
+
 
 Building
 --------
@@ -149,7 +152,6 @@ TODO
 ----
 
 * Add more tests
-* Support for numbered pagination and automatic pagination generation
 
 License
 -------
