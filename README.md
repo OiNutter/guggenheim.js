@@ -115,7 +115,7 @@ The minimum CSS required for this to work is to specify a width and height for t
 Examples
 --------
 
-Check out the [demo page](http://oinutter.github.com/guggenheim.js)
+Check out the [demo page](http://oinutter.co.uk/guggenheim.js)
 
 Plugins
 -------
