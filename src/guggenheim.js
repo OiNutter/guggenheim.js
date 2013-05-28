@@ -409,10 +409,13 @@ var guggenheim = function(element,opts){
 		},
 
 	// reorders elements according to new order
-	order = function(orderedResults){
+	order = function(orderedResults,animate){
 
 			if(!elements.length)
 				return false
+
+			if(animate==null)
+				animate=true
 
 			var row = 0,
 				col = 0,
@@ -441,7 +444,17 @@ var guggenheim = function(element,opts){
 						"opacity":"1"
 					}
 
-					_animate(el,props)
+					if(animate){
+						_animate(el,props)
+					} else {
+						el.style.top = props.top
+						el.style.left = props.left
+						if(supportsOpacity)
+							elements[i].style.opacity = props.opacity
+						else
+							elements[i].style.filter = 'alpha(opacity=' + (parseInt(props.opacity)*10) + ')'
+					}
+
 
 					col++
 
@@ -464,7 +477,7 @@ var guggenheim = function(element,opts){
 
 		},
 
-	reset = function(){
+	reset = function(animate){
 			var initialOrder = [],
 				i
 
@@ -475,7 +488,7 @@ var guggenheim = function(element,opts){
 
 			orderedElements = filteredElements
 
-			order(orderedElements)
+			order(orderedElements,animate)
 		},
 
 	add = function(el,position){
@@ -645,7 +658,7 @@ var guggenheim = function(element,opts){
 	clearProperties[prefix + 'animation-name'] =
 	clearProperties[prefix + 'animation-duration'] = ''
 
-  	reset()
+  	reset(false)
 
 	return {
 		"reset":reset,
