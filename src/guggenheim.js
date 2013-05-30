@@ -1,5 +1,5 @@
 /*
- * Guggenheim.js 0.2
+ * Guggenheim.js 0.3
  * (c) 2012 Will McKenzie
  * Provided under the MIT License
  * See http://github.com/OiNutter/guggenheim.js for more details
