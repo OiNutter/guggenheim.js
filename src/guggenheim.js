@@ -549,20 +549,43 @@ var guggenheim = function(element,opts){
 			extraHeight = 0,
 			thisExtraWidth = 0,
 			thisExtraHeight = 0,
+			horizontalMargin = 0,
+			verticalMargin = 0,
+			thisHorizontalMargin = 0,
+			thisVerticalMargin = 0,
 			containerDimensions = _getElementDimensions(container)
 		
 		for(i=0;i<elements.length;i++){
+
 			dimensions = _getElementDimensions(elements[i])
 			thisExtraWidth = dimensions.padding.left + dimensions.padding.right
 			thisExtraHeight = dimensions.padding.top + dimensions.padding.bottom
-			if(dimensions.width>width) width = dimensions.width - thisExtraWidth
-			if(dimensions.height>height) height = dimensions.height - thisExtraHeight
-			if(thisExtraWidth>extraWidth) extraWidth = thisExtraWidth
-			if(thisExtraHeight>extraHeight) extraHeight = thisExtraHeight
+			thisHorizontalMargin = dimensions.margin.left + dimensions.margin.right
+			thisVerticalMargin = dimensions.margin.top + dimensions.margin.bottom
+			
+			if(thisExtraWidth>extraWidth) 
+				extraWidth = thisExtraWidth
+			
+			if(thisExtraHeight>extraHeight) 
+				extraHeight = thisExtraHeight
+
+			if(thisHorizontalMargin>horizontalMargin) 
+				horizontalMargin = thisHorizontalMargin
+			
+			if(thisVerticalMargin>verticalMargin) 
+				verticalMargin = thisVerticalMargin
+
+			if(dimensions.width>width) 
+				width = dimensions.width - extraWidth
+			
+			if(dimensions.height>height) 
+				height = dimensions.height - extraHeight
 		}
 
-		if (options.cols != "auto" && width>containerDimensions.width/options.cols) width = Math.floor(containerDimensions.width/options.cols) - thisExtraWidth
-		if (options.rows != "auto" && height>containerDimensions.height/options.rows) height = Math.floor(containerDimensions.height/options.rows) - thisExtraHeight
+		if (options.cols != "auto" && (width+horizontalMargin)>containerDimensions.width/options.cols) 
+			width = Math.floor(containerDimensions.width/options.cols) - extraWidth - horizontalMargin
+		if (options.rows != "auto" && (height+verticalMargin)>containerDimensions.height/options.rows) 
+			height = Math.floor(containerDimensions.height/options.rows) - extraHeight - verticalMargin
 
 		for(i=0;i<elements.length;i++){
 			elements[i].style.position = 'absolute'
