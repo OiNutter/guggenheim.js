@@ -436,7 +436,7 @@ var guggenheim = function(element,opts){
 				orderedElements.push(el)
 				if(filteredElements.indexOf(el) != -1){
 					newFiltered.push(el)
-					top = ((dimensions.height + dimensions.margin.bottom + dimensions.margin.bottom) * row)
+					top = ((dimensions.height + dimensions.margin.top + dimensions.margin.bottom) * row)
 					left = ((dimensions.width + dimensions.margin.right + dimensions.margin.left) * col) + ((containerDimensions.width)*page),
 					props = {
 						"top":top + "px",
@@ -492,13 +492,16 @@ var guggenheim = function(element,opts){
 		},
 
 	add = function(el,position){
-			var dimensions = _getElementDimensions(elements[0]),
+			var containerDimensions = _getElementDimensions(container),
+				dimensions = _getElementDimensions(elements[0]),
 				matchesFilter = curFilter(el)
 
 			//set up styles
 			el.style.position = "absolute"
 			el.style.width = (dimensions.width - dimensions.padding.left - dimensions.padding.right) + "px"
 			el.style.height = (dimensions.height - dimensions.padding.top - dimensions.padding.bottom) + "px"
+			el.style.top = -(el.style.height+50)+"px"
+			el.style.left = (containerDimensions.width+50)+"px"
 			if(supportsOpacity)
 				el.style.opacity = matchesFilter ? 1 : 0
 			else
