@@ -246,9 +246,7 @@ var guggenheim = function(element,opts){
 
     		animating = true
 
-	    	var containerDimensions = _getElementDimensions(container),
-    			elDimensions = _getElementDimensions(elements[0]),
-    			pages = numPages(),
+	    	var pages = numPages(),
     			sliderWidth = pages * containerDimensions.width,
     			numPerPage = options.cols * options.rows,
     			thisPage = currentPage(),
@@ -268,9 +266,7 @@ var guggenheim = function(element,opts){
 
     		animating = true
 
-       		var containerDimensions = _getElementDimensions(container),
-    			elDimensions = _getElementDimensions(elements[0]),
-    			pages = numPages(),
+       		var pages = numPages(),
     			sliderWidth = pages * containerDimensions.width,
     			numPerPage = options.cols * options.rows,
     			thisPage = currentPage(),
@@ -295,9 +291,7 @@ var guggenheim = function(element,opts){
 
     		animating = true
 
-    		var containerDimensions = _getElementDimensions(container),
-    			elDimensions = _getElementDimensions(elements[0]),
-    			pages = numPages(),
+    		var pages = numPages(),
     			sliderWidth = pages * containerDimensions.width,
     			thisPage = currentPage(),
     			offset = -((page-1) * (containerDimensions.width-containerDimensions.padding.left)) + 'px',
@@ -318,8 +312,7 @@ var guggenheim = function(element,opts){
     },
 
     currentPage = function(){
-    	var containerDimensions = _getElementDimensions(container),
-    		page = Math.ceil(-parseFloat(slider.style.left)/containerDimensions.width) + 1
+    	var page = Math.ceil(-parseFloat(slider.style.left)/containerDimensions.width) + 1
 
 		return typeof page == "number" ? page : 1
     },
@@ -348,8 +341,6 @@ var guggenheim = function(element,opts){
 				col = 0,
 				top,
 				left,
-				dimensions = _getElementDimensions(elements[0]),
-				containerDimensions = _getElementDimensions(container),
 				page = 0,
 				i,
 				props = {},
@@ -374,8 +365,8 @@ var guggenheim = function(element,opts){
 				el = orderedElements[i]
 				if(filterFunction(el)){
 					filteredElements.push(el)
-					top = ((dimensions.height + dimensions.margin.bottom + dimensions.margin.top) * row)
-					left = ((dimensions.width + dimensions.margin.right + dimensions.margin.left) * col) + (containerDimensions.width*page)
+					top = ((elDimensions.height + elDimensions.margin.bottom + elDimensions.margin.top) * row)
+					left = ((elDimensions.width + elDimensions.margin.right + elDimensions.margin.left) * col) + (containerDimensions.width*page)
 
 					props = {
 						"top":top + "px",
@@ -421,8 +412,6 @@ var guggenheim = function(element,opts){
 				col = 0,
 				top,
 				left,
-				dimensions = _getElementDimensions(elements[0]),
-				containerDimensions = _getElementDimensions(container),
 				page = 0,
 				i,
 				props = {},
@@ -436,8 +425,8 @@ var guggenheim = function(element,opts){
 				orderedElements.push(el)
 				if(filteredElements.indexOf(el) != -1){
 					newFiltered.push(el)
-					top = ((dimensions.height + dimensions.margin.top + dimensions.margin.bottom) * row)
-					left = ((dimensions.width + dimensions.margin.right + dimensions.margin.left) * col) + ((containerDimensions.width)*page),
+					top = ((elDimensions.height + elDimensions.margin.top + elDimensions.margin.bottom) * row)
+					left = ((elDimensions.width + elDimensions.margin.right + elDimensions.margin.left) * col) + ((containerDimensions.width)*page),
 					props = {
 						"top":top + "px",
 						"left": left + "px",
@@ -492,14 +481,12 @@ var guggenheim = function(element,opts){
 		},
 
 	add = function(el,position){
-			var containerDimensions = _getElementDimensions(container),
-				dimensions = _getElementDimensions(elements[0]),
-				matchesFilter = curFilter(el)
+			var matchesFilter = curFilter(el)
 
 			//set up styles
 			el.style.position = "absolute"
-			el.style.width = (dimensions.width - dimensions.padding.left - dimensions.padding.right) + "px"
-			el.style.height = (dimensions.height - dimensions.padding.top - dimensions.padding.bottom) + "px"
+			el.style.width = (elDimensions.width - elDimensions.padding.left - elDimensions.padding.right) + "px"
+			el.style.height = (elDimensions.height - elDimensions.padding.top - elDimensions.padding.bottom) + "px"
 			el.style.top = -(el.style.height+50)+"px"
 			el.style.left = (containerDimensions.width+50)+"px"
 			if(supportsOpacity)
@@ -555,8 +542,7 @@ var guggenheim = function(element,opts){
 			horizontalMargin = 0,
 			verticalMargin = 0,
 			thisHorizontalMargin = 0,
-			thisVerticalMargin = 0,
-			containerDimensions = _getElementDimensions(container)
+			thisVerticalMargin = 0
 		
 		for(i=0;i<elements.length;i++){
 
@@ -602,6 +588,8 @@ var guggenheim = function(element,opts){
 				elements[i].style.filter = 'alpha(opacity=100)'
 		}
 
+		elDimensions = _getElementDimensions(elements[0])
+
 	}
 	
 	
@@ -639,7 +627,7 @@ var guggenheim = function(element,opts){
 		throw 'Gallery is empty'
 
 	var containerDimensions = _getElementDimensions(container), 
-		dimensions, 
+		elDimensions = _getElementDimensions(elements[0]), 
 		width, 
 		height,
 		i,
@@ -650,13 +638,11 @@ var guggenheim = function(element,opts){
 
   	//calc rows and columns
 	if(options.cols == 'auto'){
-		dimensions = _getElementDimensions(elements[0])
-		width = dimensions.width + dimensions.margin.left + dimensions.margin.right
+		width = elDimensions.width + elDimensions.margin.left + elDimensions.margin.right
 		options.cols = Math.floor(containerDimensions.width/width)
 	}
 
 	if(options.rows == 'auto'){
-		dimensions = _getElementDimensions(elements[0])
 		height = dimensions.height + dimensions.margin.top + dimensions.margin.bottom
 		options.rows = Math.floor(containerDimensions.height/height)
 	}
