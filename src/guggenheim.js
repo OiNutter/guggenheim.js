@@ -542,7 +542,8 @@ var guggenheim = function(element,opts){
 			horizontalMargin = 0,
 			verticalMargin = 0,
 			thisHorizontalMargin = 0,
-			thisVerticalMargin = 0
+			thisVerticalMargin = 0,
+			dimensions
 		
 		for(i=0;i<elements.length;i++){
 
@@ -643,7 +644,7 @@ var guggenheim = function(element,opts){
 	}
 
 	if(options.rows == 'auto'){
-		height = dimensions.height + dimensions.margin.top + dimensions.margin.bottom
+		height = elDimensions.height + elDimensions.margin.top + elDimensions.margin.bottom
 		options.rows = Math.floor(containerDimensions.height/height)
 	}
 
