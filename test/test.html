@@ -160,6 +160,14 @@
         gallery.reset()
       },
 
+      testgetCurrent: function(t){
+
+        //filter to red items
+        var filtered = gallery.filter('red')
+        t.assertEqual(filtered,gallery.getCurrent(),'getCurrent not returning correct items')
+
+      },
+
       testOrdering: function(t){
         var order = [
                 '#item-4',
@@ -184,7 +192,7 @@
 
         els = gallery.order(order)
        
-       for(var i = 0; i<els.length;i++)
+        for(var i = 0; i<els.length;i++)
             ids.push('#' + els[i].getAttribute('id'))
       
         t.assertArraysEqual(order,ids,'Elements not in correct order')

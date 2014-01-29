@@ -526,8 +526,12 @@ var guggenheim = function(element,opts){
 		},
 
 	getVisible = function(){
-		var numPerPage = options.rows * options.cols
-		return filteredElements.slice((currentPage()-1)*numPerPage,numPerPage)
+			var numPerPage = options.rows * options.cols
+			return filteredElements.slice((currentPage()-1)*numPerPage,numPerPage)
+		},
+
+	getCurrent = function(){
+		return filteredElements
 	}
 
 	
@@ -685,7 +689,8 @@ var guggenheim = function(element,opts){
 		"remove":remove,
 		"add":add,
 		"isVisible":isVisible,
-		"getVisible":getVisible
+		"getVisible":getVisible,
+		"getCurrent":getCurrent
 	}
 
 }
