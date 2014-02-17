@@ -1,0 +1,20 @@
+{
+	"camelcase":true,
+	"curly":false,
+	"eqeqeq":false,
+	"newcap":true,
+	"noempty":true,
+	"undef":true,
+	"unused":true,
+	"trailing":true,
+	"asi":true,
+	"jquery":true,
+	"browser":true,
+	"strict":false,
+	"quotmark":false,
+	"onevar":true,
+	"-W041": false,
+	"-W058":true,
+	"shadow":true,
+	"expr":true
+}
