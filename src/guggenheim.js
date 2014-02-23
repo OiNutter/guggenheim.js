@@ -132,10 +132,13 @@
 			},
 
 			// runs through list of results and hides any elements that aren't in the list of results
-			filter = function(filterFunction){
+			filter = function(filterFunction,animate){
 
 					if(!elements.length)
 						return false
+
+					if(animate==null)
+						animate=true
 					
 					var row = 0,
 						col = 0,
@@ -165,14 +168,7 @@
 						el = orderedElements[i]
 						if(filterFunction(el)){
 							filteredElements.push(el)
-							top = ((elDimensions.height + elDimensions.margin.bottom + elDimensions.margin.top) * row)
-							left = ((elDimensions.width + elDimensions.margin.right + elDimensions.margin.left) * col) + (containerDimensions.width*page)
-
-							props = {
-								"top":top + "px",
-								"left": left + "px",
-								"opacity":"1"
-							}
+							props = getNewProperties(row,page,col)
 
 							col++
 
@@ -191,7 +187,7 @@
 							}
 						}
 
-						_animate(orderedElements[i],props)
+						updateElement(el,props,animate)
 
 					}
 
@@ -210,11 +206,9 @@
 
 					var row = 0,
 						col = 0,
-						top,
-						left,
 						page = 0,
+						props,
 						i,
-						props = {},
 						el,
 						newFiltered = []
 
@@ -225,25 +219,9 @@
 						orderedElements.push(el)
 						if(filteredElements.indexOf(el) != -1){
 							newFiltered.push(el)
-							top = ((elDimensions.height + elDimensions.margin.top + elDimensions.margin.bottom) * row)
-							left = ((elDimensions.width + elDimensions.margin.right + elDimensions.margin.left) * col) + ((containerDimensions.width)*page),
-							props = {
-								"top":top + "px",
-								"left": left + "px",
-								"opacity":"1"
-							}
+							props = getNewProperties(row,col,page)
 
-							if(animate){
-								_animate(el,props)
-							} else {
-								el.style.top = props.top
-								el.style.left = props.left
-								if(supportsOpacity)
-									elements[i].style.opacity = props.opacity
-								else
-									elements[i].style.filter = 'alpha(opacity=' + (parseInt(props.opacity)*10) + ')'
-							}
-
+							updateElement(el,props,animate)
 
 							col++
 
@@ -543,23 +521,23 @@
 			for(prop in props)
 				current[prop] = _parseProps(prop === 'opacity' ? getOpacityFromComputed(comp) : comp[prop])
 
-				interval = setInterval(function(){
-					time = (new Date).getTime()
-					pos = time > finish ? 1 : (time-start)/duration
-					for(prop in target){
-						curValue = target[prop].f(current[prop].v,target[prop].v,easing[options.easing](pos)) + target[prop].u
-						if (prop === 'opacity')
-							setOpacity(el, curValue)
-						else
-							el.style[prop] = curValue
-					}
+			interval = setInterval(function(){
+				time = (new Date).getTime()
+				pos = time > finish ? 1 : (time-start)/duration
+				for(prop in target){
+					curValue = target[prop].f(current[prop].v,target[prop].v,easing[options.easing](pos)) + target[prop].u
+					if (prop === 'opacity')
+						setOpacity(el, curValue)
+					else
+						el.style[prop] = curValue
+				}
 
-					if(time>finish){
-						clearInterval(interval)
-						if(callback !== undefined)
-							callback.call()
-					}
-				},10);
+				if(time>finish){
+					clearInterval(interval)
+					if(callback !== undefined)
+						callback.call()
+				}
+			},10)
 
 		}
 
@@ -570,6 +548,36 @@
 				_animateCSS(el,props,callback)
 			else
 				_animateJS(el,props,callback)
+		}
+
+		function getNewProperties(row,col,page){
+
+			var top = ((elDimensions.height + elDimensions.margin.top + elDimensions.margin.bottom) * row),
+				left = ((elDimensions.width + elDimensions.margin.right + elDimensions.margin.left) * col) + ((containerDimensions.width)*page),
+				props = {
+					"top":top + "px",
+					"left": left + "px",
+					"opacity":"1"
+				}
+
+			return props
+
+		}
+
+		function updateElement(el, props, animate){
+
+			if(animate){
+				_animate(el,props)
+			} else {
+				el.style.top = props.top || el.style.top
+				el.style.left = props.left || el.style.top
+
+				if(supportsOpacity)
+					el.style.opacity = props.opacity
+				else
+					el.style.filter = 'alpha(opacity=' + (parseInt(props.opacity)*10) + ')'
+			}
+
 		}
 
 		function setInitialElementStyle(el,width,height){
@@ -585,27 +593,18 @@
 				el.style.filter = 'alpha(opacity=100)'
 
 		}
-		
-		function setUpElements(){
-			var i,
-				width = 0,
-				height = 0,
-				extraWidth = 0,
-				extraHeight = 0,
-				thisExtraWidth = 0,
-				thisExtraHeight = 0,
-				horizontalMargin = 0,
-				verticalMargin = 0,
-				thisHorizontalMargin = 0,
-				thisVerticalMargin = 0,
-				dimensions
-			
-			for(i=0;i<elements.length;i++){
 
-				dimensions = _getElementDimensions(elements[i])
-				thisExtraWidth = dimensions.padding.left + dimensions.padding.right
-				thisExtraHeight = dimensions.padding.top + dimensions.padding.bottom
-				thisHorizontalMargin = dimensions.margin.left + dimensions.margin.right
+		function parseDimensions(measurements,dimensions){
+			
+			var width = 0,
+				height = 0,
+				extraWidth = measurements.extraWidth || 0,
+				extraHeight = measurements.extraHeight || 0,
+				thisExtraWidth = dimensions.padding.left + dimensions.padding.right,
+				thisExtraHeight = dimensions.padding.top + dimensions.padding.bottom,
+				horizontalMargin = measurements.horizontalMargin || 0,
+				verticalMargin = measurements.verticalMargin || 0,
+				thisHorizontalMargin = dimensions.margin.left + dimensions.margin.right,
 				thisVerticalMargin = dimensions.margin.top + dimensions.margin.bottom
 					
 				if(thisExtraWidth>extraWidth)
@@ -626,17 +625,32 @@
 				if(dimensions.height>height)
 					height = dimensions.height - extraHeight
 
-			}
+				return {
+					width: width,
+					height: height,
+					extraWidth: extraWidth,
+					extraHeight: extraHeight,
+					horizontalMargin: horizontalMargin,
+					verticalMargin: verticalMargin
+				}
 
-			if (options.cols != "auto" && (width+horizontalMargin)>containerDimensions.width/options.cols)
-				width = Math.floor(containerDimensions.width/options.cols) - extraWidth - horizontalMargin
+		}
+		
+		function setUpElements(){
+			var i,
+				measurements = {}
+			
+			for(i=0;i<elements.length;i++)
+				measurements = parseDimensions(measurements,_getElementDimensions(elements[i]))
 
-			if (options.rows != "auto" && (height+verticalMargin)>containerDimensions.height/options.rows)
-				height = Math.floor(containerDimensions.height/options.rows) - extraHeight - verticalMargin
+			if (options.cols != "auto" && (measurements.width+measurements.horizontalMargin)>containerDimensions.width/options.cols)
+				measurements.width = Math.floor(containerDimensions.width/options.cols) - measurements.extraWidth - measurements.horizontalMargin
 
-			for(i=0;i<elements.length;i++){
-				setInitialElementStyle(elements[i],width,height)
-			}
+			if (options.rows != "auto" && (measurements.height+measurements.verticalMargin)>containerDimensions.height/options.rows)
+				measurements.height = Math.floor(containerDimensions.height/options.rows) - measurements.extraHeight - measurements.verticalMargin
+
+			for(i=0;i<elements.length;i++)
+				setInitialElementStyle(elements[i],measurements.width,measurements.height)
 
 			elDimensions = _getElementDimensions(elements[0])
 
