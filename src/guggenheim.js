@@ -462,16 +462,38 @@
 			return parseFloat(source+(target-source)*pos).toFixed(3)
 		}
 
-		function _s(str, p, c){ return str.substr(p,c||1); }
+		function _s(str, p, c){
+			return str.substr(p,c||1)
+		}
 		
 		function _color(source,target,pos){
-			var i = 2, j, c, tmp, v = [], r = [];
-			while(j=3,c=arguments[i-1],i--)
-			if(_s(c,0)=='r') { c = c.match(/\d+/g); while(j--) v.push(~~c[j]); } else {
-				if(c.length==4) c='#'+_s(c,1)+_s(c,1)+_s(c,2)+_s(c,2)+_s(c,3)+_s(c,3);
-				while(j--) v.push(parseInt(_s(c,1+j*2,2), 16)); }
-			while(j--) { tmp = ~~(v[j+3]+(v[j]-v[j+3])*pos); r.push(tmp<0?0:tmp>255?255:tmp); }
-			return 'rgb('+r.join(',')+')';
+			var i = 2,
+				j,
+				c,
+				tmp,
+				v = [],
+				r = []
+			
+			while(j=3,c=arguments[i-1],i--){
+				if(_s(c,0)=='r'){
+					c = c.match(/\d+/g)
+					while(j--)
+						v.push(~~c[j])
+				} else {
+					if(c.length==4)
+						c='#'+_s(c,1)+_s(c,1)+_s(c,2)+_s(c,2)+_s(c,3)+_s(c,3)
+				
+					while(j--)
+						v.push(parseInt(_s(c,1+j*2,2), 16))
+				}
+			}
+			
+			while(j--){
+				tmp = ~~(v[j+3]+(v[j]-v[j+3])*pos)
+				r.push(tmp<0?0:tmp>255?255:tmp)
+			}
+
+			return 'rgb('+r.join(',')+')'
 		}
 
 		function _parseProps(prop){
@@ -479,11 +501,31 @@
 			return isNaN(p) ? { v: q, f: _color, u: ''} : { v: p, f: _interpolate, u: q }
 		}
 
-		//animates elements
-		function _animate(el,props,callback){
+		function _animateCSS(el,props,callback){
+
 			var transitions = [],
-				key,
-				start = (new Date).getTime(),
+				key
+
+			for(key in props)
+				transitions.push(key)
+	
+			el.style.setProperty(prefix + 'transition-property',transitions.join(', '),'')
+			el.style.setProperty(prefix + 'transition-duration',options.duration + 's','')
+			el.style.setProperty(prefix + 'transition-timing-function',options.easing,'')
+			
+			_removeEvent(el,_normalizeEvent('TransitionEnd'))
+
+			if(options.duration>0)
+				_addEvent(el,_normalizeEvent('TransitionEnd'),callback)
+
+			for (key in props)
+				el.style[key] = props[key]
+
+		}
+
+		function _animateJS(el,props,callback){
+
+			var	start = (new Date).getTime(),
 				duration = options.duration*1000,
 				finish = start + duration,
 				comp = el.currentStyle ? el.currentStyle : getComputedStyle(el, null),
@@ -495,26 +537,11 @@
 				pos,
 				curValue
 
-			if(prefix != ""){
-				for(key in props)
-					transitions.push(key)
-		
-				el.style.setProperty(prefix + 'transition-property',transitions.join(', '),'')
-				el.style.setProperty(prefix + 'transition-duration',options.duration + 's','')
-				el.style.setProperty(prefix + 'transition-timing-function',options.easing,'')
-				
-				_removeEvent(el,_normalizeEvent('TransitionEnd'))
-
-				if(options.duration>0)
-					_addEvent(el,_normalizeEvent('TransitionEnd'),callback)
-
-				for (key in props)
-					el.style[key] = props[key]
-				 
-			} else {
-				
-				for (prop in props) target[prop] = _parseProps(props[prop])
-				for (prop in props) current[prop] = _parseProps(prop === 'opacity' ? getOpacityFromComputed(comp) : comp[prop])
+			for(prop in props)
+				target[prop] = _parseProps(props[prop])
+			
+			for(prop in props)
+				current[prop] = _parseProps(prop === 'opacity' ? getOpacityFromComputed(comp) : comp[prop])
 
 				interval = setInterval(function(){
 					time = (new Date).getTime()
@@ -526,7 +553,7 @@
 						else
 							el.style[prop] = curValue
 					}
-		   
+
 					if(time>finish){
 						clearInterval(interval)
 						if(callback !== undefined)
@@ -534,7 +561,29 @@
 					}
 				},10);
 
-			}
+		}
+
+		//animates elements
+		function _animate(el,props,callback){
+
+			if(prefix != "")
+				_animateCSS(el,props,callback)
+			else
+				_animateJS(el,props,callback)
+		}
+
+		function setInitialElementStyle(el,width,height){
+
+			el.style.position = 'absolute'
+			el.style.width = width + 'px'
+			el.style.height = height + 'px'
+			el.style.left = 0 + 'px'
+			el.style.top = 0 + 'px'
+			if(supportsOpacity)
+				el.style.opacity = 1
+			else
+				el.style.filter = 'alpha(opacity=100)'
+
 		}
 		
 		function setUpElements(){
@@ -558,41 +607,35 @@
 				thisExtraHeight = dimensions.padding.top + dimensions.padding.bottom
 				thisHorizontalMargin = dimensions.margin.left + dimensions.margin.right
 				thisVerticalMargin = dimensions.margin.top + dimensions.margin.bottom
-				
+					
 				if(thisExtraWidth>extraWidth)
 					extraWidth = thisExtraWidth
-				
+					
 				if(thisExtraHeight>extraHeight)
 					extraHeight = thisExtraHeight
 
 				if(thisHorizontalMargin>horizontalMargin)
 					horizontalMargin = thisHorizontalMargin
-				
+					
 				if(thisVerticalMargin>verticalMargin)
 					verticalMargin = thisVerticalMargin
 
 				if(dimensions.width>width)
 					width = dimensions.width - extraWidth
-				
+					
 				if(dimensions.height>height)
 					height = dimensions.height - extraHeight
+
 			}
 
 			if (options.cols != "auto" && (width+horizontalMargin)>containerDimensions.width/options.cols)
 				width = Math.floor(containerDimensions.width/options.cols) - extraWidth - horizontalMargin
+
 			if (options.rows != "auto" && (height+verticalMargin)>containerDimensions.height/options.rows)
 				height = Math.floor(containerDimensions.height/options.rows) - extraHeight - verticalMargin
 
 			for(i=0;i<elements.length;i++){
-				elements[i].style.position = 'absolute'
-				elements[i].style.width = width + 'px'
-				elements[i].style.height = height + 'px'
-				elements[i].style.left = 0 + 'px'
-				elements[i].style.top = 0 + 'px'
-				if(supportsOpacity)
-					elements[i].style.opacity = 1
-				else
-					elements[i].style.filter = 'alpha(opacity=100)'
+				setInitialElementStyle(elements[i],width,height)
 			}
 
 			elDimensions = _getElementDimensions(elements[0])
@@ -693,9 +736,9 @@
 	}
 
 	if(!Array.isArray){
-	  Array.isArray = function(arg){
-		return Object.prototype.toString.call(arg) == '[object Array]'
-	  }
+		Array.isArray = function(arg){
+			return Object.prototype.toString.call(arg) == '[object Array]'
+		}
 	}
 
 	if(!Array.prototype.indexOf){
@@ -711,7 +754,7 @@
 
 			if (len === 0)
 				return -1
-			   
+
 			n = 0
 			if(arguments.length > 0){
 				n = Number(arguments[1])
@@ -723,7 +766,7 @@
 
 			if(n >= len)
 				return -1
-			   
+			
 			k = n >= 0 ? n : Math.max(len - Math.abs(n), 0)
 			for(; k < len; k++){
 				if (k in t && t[k] === el)

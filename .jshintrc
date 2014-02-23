@@ -15,6 +15,7 @@
 	"onevar":true,
 	"-W041": false,
 	"-W058":true,
+	"-W065":true,
 	"shadow":true,
 	"expr":true
 }
