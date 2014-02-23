@@ -142,21 +142,13 @@
 					
 					var row = 0,
 						col = 0,
-						top,
-						left,
 						page = 0,
 						i,
-						props = {},
+						props,
 						classString,
 						el
 
-					if(typeof filterFunction == 'string' || Array.isArray(filterFunction) ){
-						if(typeof filterFunction == 'string')
-							filterFunction = [filterFunction]
-						classString = '(?=.*\\b(' + filterFunction.join(')\\b)(?=.*\\b(') + ')\\b)'
-						
-						filterFunction = function(el){ return (new RegExp(classString)).test(el.className)}
-					}
+					filterFunction = sanitiseFilterFunction(filterFunction)
 
 					curFilter = filterFunction
 
@@ -414,6 +406,17 @@
 					}
 				}
 			}
+		}
+
+		function sanitiseFilterFunction(filterFunction){
+			if(typeof filterFunction == 'string' || Array.isArray(filterFunction) ){
+				if(typeof filterFunction == 'string')
+					filterFunction = [filterFunction]
+				classString = '(?=.*\\b(' + filterFunction.join(')\\b)(?=.*\\b(') + ')\\b)'
+						
+				filterFunction = function(el){ return (new RegExp(classString)).test(el.className)}
+			}
+			return filterFunction
 		}
 
 		if (supportsOpacity) {
