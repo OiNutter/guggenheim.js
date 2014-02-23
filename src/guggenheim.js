@@ -145,7 +145,6 @@
 						page = 0,
 						i,
 						props,
-						classString,
 						el
 
 					filterFunction = sanitiseFilterFunction(filterFunction)
@@ -409,6 +408,8 @@
 		}
 
 		function sanitiseFilterFunction(filterFunction){
+			var classString
+			
 			if(typeof filterFunction == 'string' || Array.isArray(filterFunction) ){
 				if(typeof filterFunction == 'string')
 					filterFunction = [filterFunction]
