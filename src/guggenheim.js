@@ -60,7 +60,7 @@
 						_animate(slider,{"left":(parseFloat(slider.offsetLeft) + containerDimensions.width - containerDimensions.padding.left) + 'px'},paginationCallback)
 					else
 						animating = false
-					
+
 					return newEls
 
 				},
@@ -73,14 +73,14 @@
 					var	numPerPage = options.cols * options.rows,
 						thisPage = currentPage(),
 						newEls = filteredElements.slice(thisPage*numPerPage,(thisPage*numPerPage) + numPerPage)
-				
+
 					if(newEls.length)
 						_animate(slider,{"left":(parseFloat(slider.offsetLeft) - containerDimensions.width-containerDimensions.padding.left) + 'px'},paginationCallback)
 					else
 						animating = false
 
 					return newEls
-					
+
 				},
 
 			jumpTo = function(page,animate){
@@ -108,7 +108,7 @@
 					} else {
 						animating = false
 					}
-					
+
 					return newEls
 			},
 
@@ -139,7 +139,7 @@
 
 					if(animate==null)
 						animate=true
-					
+
 					var row = 0,
 						col = 0,
 						page = 0,
@@ -283,10 +283,10 @@
 					filteredElements.splice(filteredIndex,1)
 					slider.removeChild(el)
 					elements = container.querySelectorAll(options.selector)
-			
+
 					if(filteredElements.length)
 						order(orderedElements)
-			
+
 					if(jumpBack)
 						jumpTo(currentPage()-1)
 
@@ -346,7 +346,7 @@
 
 		function _getElementDimensions(el){
 			var style = (window.getComputedStyle) ? window.getComputedStyle(el,null) : el.currentStyle
-			
+
 			return {
 				"height": parseFloat(style.height) + (parseFloat(style.paddingTop) || 0) + (parseFloat(style.paddingBottom) || 0) + (parseFloat(style.borderTopWidth) || 0) + (parseFloat(style.borderBottomWidth) || 0),
 				"width": parseFloat(style.width) + (parseFloat(style.paddingLeft) || 0) + (parseFloat(style.paddingRight) || 0) + (parseFloat(style.borderLeftWidth) || 0) + (parseFloat(style.borderRightWidth) || 0),
@@ -370,7 +370,7 @@
 		}
 
 		function _addEvent(el,event,callback){
-			
+
 			var id = _zid(el)
 
 			if(!handlers[id])
@@ -409,12 +409,12 @@
 
 		function sanitiseFilterFunction(filterFunction){
 			var classString
-			
+
 			if(typeof filterFunction == 'string' || Array.isArray(filterFunction) ){
 				if(typeof filterFunction == 'string')
 					filterFunction = [filterFunction]
 				classString = '(?=.*\\b(' + filterFunction.join(')\\b)(?=.*\\b(') + ')\\b)'
-						
+
 				filterFunction = function(el){ return (new RegExp(classString)).test(el.className)}
 			}
 			return filterFunction
@@ -447,7 +447,7 @@
 		function _s(str, p, c){
 			return str.substr(p,c||1)
 		}
-		
+
 		function _color(source,target,pos){
 			var i = 2,
 				j,
@@ -455,7 +455,7 @@
 				tmp,
 				v = [],
 				r = []
-			
+
 			while(j=3,c=arguments[i-1],i--){
 				if(_s(c,0)=='r'){
 					c = c.match(/\d+/g)
@@ -464,12 +464,12 @@
 				} else {
 					if(c.length==4)
 						c='#'+_s(c,1)+_s(c,1)+_s(c,2)+_s(c,2)+_s(c,3)+_s(c,3)
-				
+
 					while(j--)
 						v.push(parseInt(_s(c,1+j*2,2), 16))
 				}
 			}
-			
+
 			while(j--){
 				tmp = ~~(v[j+3]+(v[j]-v[j+3])*pos)
 				r.push(tmp<0?0:tmp>255?255:tmp)
@@ -490,11 +490,11 @@
 
 			for(key in props)
 				transitions.push(key)
-	
+
 			el.style.setProperty(prefix + 'transition-property',transitions.join(', '),'')
 			el.style.setProperty(prefix + 'transition-duration',options.duration + 's','')
 			el.style.setProperty(prefix + 'transition-timing-function',options.easing,'')
-			
+
 			_removeEvent(el,_normalizeEvent('TransitionEnd'))
 
 			if(options.duration>0)
@@ -521,7 +521,7 @@
 
 			for(prop in props)
 				target[prop] = _parseProps(props[prop])
-			
+
 			for(prop in props)
 				current[prop] = _parseProps(prop === 'opacity' ? getOpacityFromComputed(comp) : comp[prop])
 
@@ -599,7 +599,7 @@
 		}
 
 		function parseDimensions(measurements,dimensions){
-			
+
 			var width = 0,
 				height = 0,
 				extraWidth = measurements.extraWidth || 0,
@@ -610,22 +610,22 @@
 				verticalMargin = measurements.verticalMargin || 0,
 				thisHorizontalMargin = dimensions.margin.left + dimensions.margin.right,
 				thisVerticalMargin = dimensions.margin.top + dimensions.margin.bottom
-					
+
 				if(thisExtraWidth>extraWidth)
 					extraWidth = thisExtraWidth
-					
+
 				if(thisExtraHeight>extraHeight)
 					extraHeight = thisExtraHeight
 
 				if(thisHorizontalMargin>horizontalMargin)
 					horizontalMargin = thisHorizontalMargin
-					
+
 				if(thisVerticalMargin>verticalMargin)
 					verticalMargin = thisVerticalMargin
 
 				if(dimensions.width>width)
 					width = dimensions.width - extraWidth
-					
+
 				if(dimensions.height>height)
 					height = dimensions.height - extraHeight
 
@@ -639,11 +639,11 @@
 				}
 
 		}
-		
+
 		function setUpElements(){
 			var i,
 				measurements = {}
-			
+
 			for(i=0;i<elements.length;i++)
 				measurements = parseDimensions(measurements,_getElementDimensions(elements[i]))
 
@@ -659,13 +659,13 @@
 			elDimensions = _getElementDimensions(elements[0])
 
 		}
-		
-		
+
+
 		if(typeof element == 'string' && document.querySelector(element)==null)
 			throw 'Element ' + element + " does not exist!"
 
 		container = (typeof element == 'string') ? document.querySelector(element): element
-		
+
 		options = _mergeOptions({
 			'selector':'div.guggenheim-item',
 			'rows':'auto',
@@ -716,7 +716,7 @@
 		slider = container.querySelector(options.slider)
 		slider.style.left = containerDimensions.padding.left + "px"
 		slider.style.position = 'relative'
-				
+
 		;(function(){
 			for(var i=0;i<keys.length;i++){
 				if (testEl.style[keys[i] + 'TransitionProperty'] !== undefined) {
@@ -776,7 +776,7 @@
 			n = 0
 			if(arguments.length > 0){
 				n = Number(arguments[1])
-				if(n != n) // shortcut for verifying if it's NaN  
+				if(n != n) // shortcut for verifying if it's NaN
 					n = 0
 				else if(n != 0 && n != Infinity && n != -Infinity)
 					n = (n > 0 || -1) * Math.floor(Math.abs(n))
@@ -784,7 +784,7 @@
 
 			if(n >= len)
 				return -1
-			
+
 			k = n >= 0 ? n : Math.max(len - Math.abs(n), 0)
 			for(; k < len; k++){
 				if (k in t && t[k] === el)
