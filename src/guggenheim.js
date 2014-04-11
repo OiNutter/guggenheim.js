@@ -248,6 +248,14 @@
 					order(orderedElements,animate)
 				},
 
+	  reload = function(animate){
+
+		  elements = container.querySelectorAll(options.selector)
+		  setUpElements()
+		  reset(animate)
+
+	  },
+
 			add = function(el,position){
 					var matchesFilter = curFilter(el)
 
@@ -737,6 +745,7 @@
 
 		return {
 			"reset":reset,
+			"reload":reload,
 			"order":order,
 			"filter":filter,
 			"prev":prev,
