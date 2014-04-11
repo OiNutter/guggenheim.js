@@ -14,10 +14,12 @@ namespace('guggenheim', function(){
 		if(!fs.existsSync('dist'))
 			fs.mkdir('dist')
 
-		var ast = uglifyjs.minify('src/guggenheim.js'), // parse code and get the initial AST
-			output = fs.openSync('dist/guggenheim.min.js','w+')
+		var ast = uglifyjs.minify('src/guggenheim.js',{outSourceMap:'guggenheim.min.map'}), // parse code and get the initial AST
+			output = fs.openSync('dist/guggenheim.min.js','w+'),
+			sourceMap = fs.openSync('dist/guggenheim.min.map','w+')
 
-		fs.writeSync(output,ast.code)
+		fs.writeSync(output,ast.code + "\n //# sourceMappingURL=guggenheim.min.map")
+		fs.writeSync(sourceMap,ast.map)
 	})
 
 	desc('Runs PhantomJS tests')
