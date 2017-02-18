@@ -159,7 +159,7 @@
 						el = orderedElements[i]
 						if(filterFunction(el)){
 							filteredElements.push(el)
-							props = getNewProperties(row,page,col)
+							props = getNewProperties(row,col,page)
 
 							col++
 
